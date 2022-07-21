@@ -5,6 +5,7 @@ const _import = require('@/libs/util.import.' + process.env.NODE_ENV)
 
 /**
  * 在主框架内显示
+ * auth:true 验证当前路由所有的匹配中是否需要有登录验证的
  */
 const frameIn = [
   {
@@ -21,24 +22,24 @@ const frameIn = [
         },
         component: _import('system/index')
       },
-      // 演示页面
+      // 路径列表
       {
-        path: 'page1',
-        name: 'page1',
+        path: 'route-list',
+        name: 'route-list',
         meta: {
-          title: '页面 1',
+          title: '路径列表',
           auth: true
         },
-        component: _import('demo/page1')
+        component: _import('route/route-list')
       },
       {
-        path: 'page2',
-        name: 'page2',
+        path: 'editon-info',
+        name: 'editon-info',
         meta: {
-          title: '页面 2',
+          title: '版本信息',
           auth: true
         },
-        component: _import('demo/page2')
+        component: _import('edition/edition-info')
       },
       {
         path: 'page3',

@@ -42,7 +42,7 @@ module.exports = {
     disableHostCheck: process.env.NODE_ENV === 'development', // 关闭 host check，方便使用 ngrok 之类的内网转发工具
     proxy: {
       '/api': {
-        target: 'http://106.55.229.44:443',
+        target: process.env.VUE_APP_PROXY,
         changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
         pathRewrite: {
           '^/api': '/api'

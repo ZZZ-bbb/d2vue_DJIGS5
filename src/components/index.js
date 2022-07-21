@@ -6,3 +6,5 @@ import d2Container from './d2-container'
 Vue.component('d2-container', d2Container)
 Vue.component('d2-icon', () => import('./d2-icon'))
 Vue.component('d2-icon-svg', () => import('./d2-icon-svg/index.vue'))
+Vue.component('d2-table', () => import('./d2-table/index.vue'))
+Vue.component('d2-uploader', () => import('./d2-uploader/index.vue'))
