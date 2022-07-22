@@ -53,10 +53,13 @@
     </el-dialog>
     <el-dialog
       title="电池数据"
+      :fullscreen="true"
       :visible.sync="chartDialogVisible"
       :closeOnClickModal="false"
       :destroyOnClose="true"
       >
+      <div class="block">
+      <div class="block_left">
       <div class="page-task-chart-radio" flex="main:center cross:center">
         <el-radio-group v-model="radio" @change="changeType">
           <el-radio :label="0">电压（V）</el-radio>
@@ -67,9 +70,32 @@
         </el-radio-group>
       </div>
       <div id="chart"></div>
-      <span slot="footer" class="dialog-footer">
+      <div class="font">作业路线</div>
+      <div class="page-task-chart-radio" flex="main:center cross:center">
+        <el-radio-group v-model="radio1" @change="changeType1">
+          <el-radio :label="0">实际路线</el-radio>
+          <el-radio :label="1">预定路线</el-radio>
+          <el-radio :label="2">重合展示</el-radio>
+        </el-radio-group>
+      </div>
+      <div id="uavchart"></div>
+      </div>
+      <div class="block_right">
+        <el-descriptions title="作业信息" direction="vertical" size="medium" :column="1" border >
+        <el-descriptions-item label="作业ID">{{this.task_id}}</el-descriptions-item>
+        <el-descriptions-item label="上传用户">{{this.UserID}}</el-descriptions-item>
+        <el-descriptions-item label="模式">
+        <el-tag size="small">施肥</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="作业时间"  :span="3">{{this.filename}}</el-descriptions-item>
+        <el-descriptions-item label="上传时间"  :span="4">{{this.created_at}}</el-descriptions-item>
+        <el-descriptions-item label="作业地址">/</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      </div>
+      <!-- <span slot="footer" class="dialog-footer">
         <el-button @click="chartDialogVisible = false">关 闭</el-button>
-      </span>
+      </span> -->
     </el-dialog>
   </d2-container>
 </template>
@@ -82,8 +108,14 @@ export default {
   name: 'task-list',
   data () {
     return {
+      task_id:"",
+      UserID:"",
+      filename:"",
+      created_at:"",
       chartData: [[], [], [], [], []],
+      chart1Data: [[], []],
       radio: 0,
+      radio1: 0,
       dialogVisible: false,
       chartDialogVisible: false,
       fileList: [],
@@ -180,6 +212,8 @@ export default {
           return [time + index * 1000, val]
         })
       }
+      this.chartData = [[], [], [], [], []]
+      this.chart1Data = [[], [], []]
       const task_id = row.task_id
       this.chartDialogVisible = true
       this.getTaskBatInfo({ task_id }).then((res) => {
@@ -194,6 +228,26 @@ export default {
         }
         util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: this.chartData[this.radio] } }))
       })
+      this.getTaskUavInfo({ task_id }).then((res) => {
+        var a = []
+        var d = []
+        for (var i in res.data.latlng) {
+          var bi = res.data.latlng[i].split(',')
+          a.push(bi)
+        }
+        for (var j in res.data.latlng_route) {
+          var ci = res.data.latlng_route[j].split(',')
+          d.push(ci)
+        }
+        this.chart1Data[0] = a
+        this.chart1Data[1] = d
+        util.echarts.init('uavchart', Object.assign(echartOption.uavInfo, { dataset: { source: this.chart1Data[this.radio1] } }))
+      })
+      this.task_id = row.task_id
+      this.created_at = row.created_at
+      this.filename = row.filename
+      this.UserID = row.UserID
+      console.log(this.task_id);
     },
     downloadData (row) {
       const task_id = row.task_id
@@ -235,6 +289,11 @@ export default {
     },
     changeType (value) {
       util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: this.chartData[this.radio] } }))
+    },
+    changeType1 (value) {
+      util.echarts.init('uavchart', Object.assign(echartOption.uavInfo, { dataset: { source: this.chart1Data[this.radio1] } }))
+      console.log(this.chartData[this.radio])
+      console.log(this.chart1Data[this.radio])
     }
   }
 }
@@ -249,7 +308,30 @@ export default {
   color: #606266;
   margin-top: 7px;
 }
+.block{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.block_left{
+  width: 50%;
+  float: left;
+}
+.block_right{
+  margin-right: 250px;
+  float: right;
+  width: 30%;
+
+  text-align:left;
+}
+.font{
+  font-size:20px; 
+  font-family:"微软雅黑",Arial;
+}
 #chart {
-  height: 300px;
+  height: 550px;
+}
+#uavchart {
+  height: 550px;
 }
 </style>

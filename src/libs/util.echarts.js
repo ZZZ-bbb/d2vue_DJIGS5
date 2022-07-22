@@ -10,9 +10,6 @@ var chart
  * @param {object} data 配置项，万能接口
  */
 echart.init = function (id, data = {}) {
-  if (chart !== null && chart !== '' && chart !== undefined) {
-    chart.dispose() // 销毁chart实例
-  }
   chart = echarts.init(document.getElementById(id))
   chart.setOption(data)
   // 图标自适应监听
