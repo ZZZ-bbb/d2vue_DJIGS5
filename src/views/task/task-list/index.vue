@@ -52,11 +52,20 @@
       </span>
     </el-dialog>
     <el-dialog
-      title="数据"
+      title="电池数据"
       :visible.sync="chartDialogVisible"
       :closeOnClickModal="false"
-      :destroyOnClose="false"
+      :destroyOnClose="true"
       >
+      <div class="page-task-chart-radio" flex="main:center cross:center">
+        <el-radio-group v-model="radio" @change="changeType">
+          <el-radio :label="0">电压（V）</el-radio>
+          <el-radio :label="1">电流（A）</el-radio>
+          <el-radio :label="2">温度（℃）</el-radio>
+          <el-radio :label="3">剩余电量（%）</el-radio>
+          <el-radio :label="4">剩余容量（Ah）</el-radio>
+        </el-radio-group>
+      </div>
       <div id="chart"></div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="chartDialogVisible = false">关 闭</el-button>
@@ -73,7 +82,8 @@ export default {
   name: 'task-list',
   data () {
     return {
-      vData: [],
+      chartData: [[], [], [], [], []],
+      radio: 0,
       dialogVisible: false,
       chartDialogVisible: false,
       fileList: [],
@@ -163,16 +173,26 @@ export default {
       })
     },
     showData (row) {
+      function dueData (arr, time) {
+        return arr.filter((val, index) => {
+          return index % 10 === 0
+        }).map((val, index) => {
+          return [time + index * 1000, val]
+        })
+      }
       const task_id = row.task_id
       this.chartDialogVisible = true
       this.getTaskBatInfo({ task_id }).then((res) => {
-        const data = res.data.v
-        const data1 = data.filter((val, index) => {
-          return index % 10 === 0
-        }).map((val, index) => {
-          return [1653026495000 + index * 1000, val]
-        })
-        util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: data1 } }))
+        const resData = res.data
+        for (const tmp in resData) {
+          const timeData = Date.parse(resData[tmp].time)
+          this.chartData[0] = this.chartData[0].concat(dueData(resData[tmp].V, timeData))
+          this.chartData[1] = this.chartData[1].concat(dueData(resData[tmp].A, timeData))
+          this.chartData[2] = this.chartData[2].concat(dueData(resData[tmp].T, timeData))
+          this.chartData[3] = this.chartData[3].concat(dueData(resData[tmp].rP, timeData))
+          this.chartData[4] = this.chartData[4].concat(dueData(resData[tmp].rA, timeData))
+        }
+        util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: this.chartData[this.radio] } }))
       })
     },
     downloadData (row) {
@@ -212,6 +232,9 @@ export default {
       this.currentPage = 1
       this.pageSize = val
       this.getData()
+    },
+    changeType (value) {
+      util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: this.chartData[this.radio] } }))
     }
   }
 }
