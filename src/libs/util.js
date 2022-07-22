@@ -2,12 +2,14 @@ import cookies from './util.cookies'
 import db from './util.db'
 import log from './util.log'
 import uploader from './util.uploader'
+import echarts from './util.echarts'
 
 const util = {
   cookies,
   db,
   log,
-  uploader
+  uploader,
+  echarts
 }
 
 /**

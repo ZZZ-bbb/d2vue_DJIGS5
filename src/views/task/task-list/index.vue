@@ -1,22 +1,22 @@
 <template>
   <d2-container>
     <template slot="header">
-      <div class="page-edition-upload" flex="main:justify cross:center">
+      <div class="page-task-upload" flex="main:justify cross:center">
         <div>
           <d2-icon name="exclamation-circle"/>
           <span>{{`共有 ${total} 条记录，当前显示第 ${Math.min((currentPage-1)*pageSize+1, total)} 至第 ${Math.min(currentPage*pageSize, total)} 条记录`}}</span>
         </div>
-        <el-button @click="dialogVisible = true">上传文件</el-button>
+        <el-button @click="dialogVisible = true">上传数据</el-button>
       </div>
     </template>
-    <div class="page-edition-table">
+    <div class="page-task-table">
       <d2-table
-        :tableData="editionData"
+        :tableData="taskData"
         :tableColumn="tableColumn"
         :sortData="sortData">
       </d2-table>
     </div>
-    <div class="page-edition-table-pagination">
+    <div class="page-task-table-pagination">
       <el-pagination
         background
         layout="total, sizes, prev, pager, next, jumper"
@@ -32,63 +32,56 @@
       title="上传路径"
       :visible.sync="dialogVisible"
       :closeOnClickModal="false"
-      :destroyOnClose="false"
+      :destroyOnClose="true"
       width="25%">
-      <el-form
-        ref="formData"
-        :model="formData"
-        :rules="rules">
-        <el-form-item label="版本号" prop="Edition_filename">
-          <el-input v-model="formData.Edition_filename"></el-input>
-        </el-form-item>
-        <el-form-item label="版本描述" prop="Edition_desc">
-          <el-input type="textarea" :rows="2" v-model="formData.Edition_desc"></el-input>
-        </el-form-item>
-      </el-form>
       <el-upload
         ref="upload"
         action="fakeaction"
         :file-list="fileList"
         :auto-upload="false"
         :limit="1"
+        :multiple="true"
         :http-request="uploadSectionFile"
         :on-exceed="handleExceed">
-        <div slot="tip" class="page-edition-upload-tip">只能上传apk格式文件</div>
+        <div slot="tip" class="page-task-upload-tip">只能上传txt格式文件</div>
         <el-button slot="trigger">选择文件</el-button>
       </el-upload>
       <span slot="footer" class="dialog-footer">
-      <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click="uploadData">上 传</el-button>
-    </span>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="uploadData">上 传</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="数据"
+      :visible.sync="chartDialogVisible"
+      :closeOnClickModal="false"
+      :destroyOnClose="false"
+      >
+      <div id="chart"></div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="chartDialogVisible = false">关 闭</el-button>
+      </span>
     </el-dialog>
   </d2-container>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import util from '@/libs/util'
+import echartOption from './echartOption'
 export default {
-  name: 'edition-list',
+  name: 'task-list',
   data () {
     return {
+      vData: [],
       dialogVisible: false,
+      chartDialogVisible: false,
       fileList: [],
-      editionData: [], // 总数据
+      taskData: [], // 总数据
       currentPage: 1, // 当前页码
       total: 0, // 总条数
       pageSize: 10, // 每页的数据条数
       sortData: { prop: 'created_at', order: 'ascending' },
-      formData: {
-        Edition_filename: '',
-        Edition_desc: ''
-      },
-      rules: {
-        Edition_filename: [
-          { required: true, message: '请输入版本号', trigger: 'blur' }
-        ],
-        Edition_desc: [
-          { required: true, message: '请输入版本描述', trigger: 'blur' }
-        ]
-      },
       tableColumn: [
         {
           prop: '',
@@ -99,7 +92,7 @@ export default {
           }
         },
         {
-          prop: 'Edition_ID',
+          prop: 'task_id',
           title: 'ID',
           align: 'center'
         },
@@ -109,18 +102,8 @@ export default {
           align: 'center'
         },
         {
-          prop: 'Edition_filename',
-          title: '版本号',
-          align: 'center'
-        },
-        {
-          prop: 'Edition_desc',
-          title: '版本描述',
-          align: 'center'
-        },
-        {
           prop: 'created_at',
-          title: '上传时间',
+          title: '作业时间',
           align: 'center',
           sortable: true
         },
@@ -135,7 +118,7 @@ export default {
                   plain
                   style='padding: 6px'
                   type='primary'
-                  onClick={ this.showData.bind(this, index) }
+                  onClick={ this.showData.bind(this, row) }
                 >
                   查看
                 </el-button>
@@ -166,28 +149,39 @@ export default {
     this.getData()
   },
   methods: {
-    ...mapActions('d2admin/edition', [
-      'getEditionData', 'deleteEditionData', 'downloadEditionData'
+    ...mapActions('d2admin/task', [
+      'getTaskData', 'deleteTaskData', 'downloadTaskData',
+      'getTaskDetail', 'getTaskUavInfo', 'getTaskBatInfo'
     ]),
     ...mapActions('d2admin/uploader', [
       'pushTmp'
     ]),
     getData () {
-      this.getEditionData({ page: this.currentPage, list_num: this.pageSize }).then(res => {
+      this.getTaskData({ page: this.currentPage, list_num: this.pageSize }).then(res => {
         this.total = res.data.count
-        this.editionData = res.data.data
+        this.taskData = res.data.data
       })
     },
-    showData () {
-      console.log(this.editionData)
+    showData (row) {
+      const task_id = row.task_id
+      this.chartDialogVisible = true
+      this.getTaskBatInfo({ task_id }).then((res) => {
+        const data = res.data.v
+        const data1 = data.filter((val, index) => {
+          return index % 10 === 0
+        }).map((val, index) => {
+          return [1653026495000 + index * 1000, val]
+        })
+        util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: data1 } }))
+      })
     },
     downloadData (row) {
-      const Edition_ID = row.Edition_ID
-      this.downloadEditionData(Edition_ID)
+      const task_id = row.task_id
+      this.downloadTaskData(task_id)
     },
     deleteData (row) {
-      const Edition_ID = row.Edition_ID
-      this.deleteEditionData({ Edition_ID })
+      const task_id = row.task_id
+      this.deleteTaskData({ task_id })
     },
     uploadData () {
       if (this.$refs.upload.uploadFiles.length === 0) {
@@ -199,12 +193,12 @@ export default {
     uploadSectionFile (params) {
       const file = params.file
       const fileType = file.type
-      const isApk = fileType.indexOf('android.package-archive') !== -1
-      if (!isApk) {
+      const isText = fileType.indexOf('text') !== -1
+      if (!isText) {
         this.$refs.upload.clearFiles()
-        return this.$message.error('请上传apk格式文件')
+        return this.$message.error('请上传txt格式文件')
       }
-      this.pushTmp({ file, type: 'edition', data: this.formData })
+      this.pushTmp({ file, type: 'task' })
       this.dialogVisible = false
     },
     handleExceed (files, fileList) {
@@ -223,13 +217,16 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.page-edition-table-pagination {
+.page-task-table-pagination {
   height: 8%;
   margin-top: 1%;
 }
-.page-edition-upload-tip {
+.page-task-upload-tip {
   font-size: 12px;
   color: #606266;
   margin-top: 7px;
+}
+#chart {
+  height: 300px;
 }
 </style>

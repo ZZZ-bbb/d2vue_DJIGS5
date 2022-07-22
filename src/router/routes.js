@@ -32,6 +32,7 @@ const frameIn = [
         },
         component: _import('route/route-list')
       },
+      // 版本信息
       {
         path: 'editon-info',
         name: 'editon-info',
@@ -40,6 +41,16 @@ const frameIn = [
           auth: true
         },
         component: _import('edition/edition-info')
+      },
+      // 作业数据
+      {
+        path: 'task-list',
+        name: 'task-list',
+        meta: {
+          title: '数据列表',
+          auth: true
+        },
+        component: _import('task/task-list')
       },
       {
         path: 'page3',

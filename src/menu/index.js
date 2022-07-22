@@ -30,6 +30,13 @@ export const menuHeader = supplementPath([
     children: [
       { path: 'editon-info', title: '版本信息' }
     ]
+  },
+  {
+    title: '作业数据',
+    icon: 'folder-o',
+    children: [
+      { path: 'task-list', title: '数据列表' }
+    ]
   }
 ])
 
@@ -47,6 +54,13 @@ export const menuAside = supplementPath([
     icon: 'folder-o',
     children: [
       { path: 'editon-info', title: '版本信息' }
+    ]
+  },
+  {
+    title: '作业数据',
+    icon: 'folder-o',
+    children: [
+      { path: 'task-list', title: '数据列表' }
     ]
   }
 ])

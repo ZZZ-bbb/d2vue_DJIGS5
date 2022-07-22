@@ -4,7 +4,7 @@
       <div class="page-route-upload" flex="main:justify cross:center">
         <div>
           <d2-icon name="exclamation-circle"/>
-          <span>{{`共有 ${total} 条记录，当前显示第 ${Math.min((currentPage-1)*pageSize+1, total)} 至第 ${Math.min(currentPage*pageSize, total-1)} 条记录`}}</span>
+          <span>{{`共有 ${total} 条记录，当前显示第 ${Math.min((currentPage-1)*pageSize+1, total)} 至第 ${Math.min(currentPage*pageSize, total)} 条记录`}}</span>
         </div>
         <el-button @click="dialogVisible = true">上传路径</el-button>
       </div>
@@ -132,7 +132,7 @@ export default {
                   plain
                   style= 'padding: 6px'
                   type='primary'
-                  onClick={ this.downloadData.bind(this, index) }
+                  onClick={ this.downloadData.bind(this, row) }
                 >
                   下载
                 </el-button>
@@ -140,7 +140,7 @@ export default {
                   plain
                   style= 'padding: 6px'
                   type='danger'
-                  onClick={ this.deleteData.bind(this, index) }
+                  onClick={ this.deleteData.bind(this, row) }
                 >
                   删除
                 </el-button>
@@ -165,20 +165,17 @@ export default {
       this.getRouteData({ page: this.currentPage, list_num: this.pageSize }).then(res => {
         this.total = res.data.count
         this.routeData = res.data.data
-        console.log(res)
       })
     },
-    showData () {
-      console.log(this.routeData)
+    showData (index) {
+      console.log(index)
     },
-    downloadData (index) {
-      const currentIndex = index + (this.currentPage - 1) * this.pageSize
-      const Route_id = this.routeData[currentIndex].Route_id
+    downloadData (row) {
+      const Route_id = row.Route_id
       this.downloadRouteData(Route_id)
     },
-    deleteData (index) {
-      const currentIndex = index + (this.currentPage - 1) * this.pageSize
-      const Route_id = this.routeData[currentIndex].Route_id
+    deleteData (row) {
+      const Route_id = row.Route_id
       this.deleteRouteData({ Route_id })
     },
     uploadData () {
