@@ -116,10 +116,10 @@ export default {
   name: 'task-list',
   data () {
     return {
-      task_id:"",
-      UserID:"",
-      filename:"",
-      created_at:"",
+      task_id: '',
+      UserID: '',
+      filename: '',
+      created_at: '',
       chartData: [[], [], [], [], []],
       chart1Data: [[], []],
       radio: 0,
@@ -255,7 +255,7 @@ export default {
       this.created_at = row.created_at
       this.filename = row.filename.split(".")[0].replace("年","-").replace("月","-").replace("时",":").replace("分",":")
       this.UserID = row.UserID
-      console.log(this.task_id);
+      console.log(this.task_id)
     },
     downloadData (row) {
       const task_id = row.task_id
@@ -329,12 +329,11 @@ export default {
   margin-right: 250px;
   float: right;
   width: 30%;
-
-  text-align:left;
+  text-align: left;
 }
 .font{
-  font-size:20px; 
-  font-family:"微软雅黑",Arial;
+  font-size: 20px;
+  font-family: "微软雅黑", Arial;
 }
 #chart {
   height: 550px;
