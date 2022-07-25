@@ -75,7 +75,7 @@
         <el-radio-group v-model="radio1" @change="changeType1">
           <el-radio :label="0">实际路线</el-radio>
           <el-radio :label="1">预定路线</el-radio>
-          <el-radio :label="2">重合展示</el-radio>
+          <!-- <el-radio :label="2">重合展示</el-radio> -->
         </el-radio-group>
       </div>
       <div id="uavchart"></div>
@@ -85,12 +85,20 @@
         <el-descriptions-item label="作业ID">{{this.task_id}}</el-descriptions-item>
         <el-descriptions-item label="上传用户">{{this.UserID}}</el-descriptions-item>
         <el-descriptions-item label="模式">
-        <el-tag size="small">施肥</el-tag>
+        <el-tag size="small" type="success">施肥</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="状态">
+        <el-tag size="small" type="success">正常</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="作业时间"  :span="3">{{this.filename}}</el-descriptions-item>
         <el-descriptions-item label="上传时间"  :span="4">{{this.created_at}}</el-descriptions-item>
         <el-descriptions-item label="作业地址">/</el-descriptions-item>
+        <el-descriptions-item label="异常">/</el-descriptions-item>
         </el-descriptions>
+        <div style="margin-top:50px;margin-right:30%;">
+          <el-button size="large" type="primary" plain>进入地图</el-button>
+          <el-button @click="chartDialogVisible = false" size="large" type="danger" plain >关闭</el-button>
+        </div> 
       </div>
       </div>
       <!-- <span slot="footer" class="dialog-footer">
@@ -245,7 +253,7 @@ export default {
       })
       this.task_id = row.task_id
       this.created_at = row.created_at
-      this.filename = row.filename
+      this.filename = row.filename.split(".")[0].replace("年","-").replace("月","-").replace("时",":").replace("分",":")
       this.UserID = row.UserID
       console.log(this.task_id);
     },
