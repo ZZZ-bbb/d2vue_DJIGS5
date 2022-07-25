@@ -18,24 +18,19 @@ function supplementPath (menu) {
 export const menuHeader = supplementPath([
   { path: '/index', title: '首页', icon: 'home' },
   {
-    title: '作业路径',
+    title: '地块管理',
     icon: 'folder-o',
     children: [
-      { path: '/route-list', title: '路径列表' }
+      { path: '/field-list', title: '查看地块' },
+      { path: '/field-add', title: '添加地块' },
+      { path: '/farm-management', title: '添加地块' }
     ]
   },
   {
-    title: '软件管理',
+    title: '农事管理',
     icon: 'folder-o',
     children: [
-      { path: 'editon-info', title: '版本信息' }
-    ]
-  },
-  {
-    title: '作业数据',
-    icon: 'folder-o',
-    children: [
-      { path: 'task-list', title: '数据列表' }
+      { path: '/farm-management', title: '农事管理' }
     ]
   }
 ])
@@ -43,24 +38,18 @@ export const menuHeader = supplementPath([
 export const menuAside = supplementPath([
   { path: '/index', title: '首页', icon: 'home' },
   {
-    title: '作业路径',
+    title: '地块管理',
     icon: 'folder-o',
     children: [
-      { path: '/route-list', title: '路径列表' }
+      { path: '/field-list', title: '查看地块' },
+      { path: '/field-add', title: '添加地块' }
     ]
   },
   {
-    title: '软件管理',
+    title: '农事管理',
     icon: 'folder-o',
     children: [
-      { path: 'editon-info', title: '版本信息' }
-    ]
-  },
-  {
-    title: '作业数据',
-    icon: 'folder-o',
-    children: [
-      { path: 'task-list', title: '数据列表' }
+      { path: '/farm-management', title: '农事管理' }
     ]
   }
 ])

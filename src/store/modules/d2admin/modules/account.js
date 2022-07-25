@@ -7,18 +7,6 @@ export default {
   namespaced: true,
   actions: {
     /**
-     * @description 获取验证码并保存token
-     */
-    async code () {
-      // 保存authorization的token
-      const res = await api.SYS_USER_CODE()
-      const token = res.headers.authorization
-      if (token !== '' && token !== undefined && token !== null) {
-        util.cookies.set('code_token', token)
-      }
-      return res.data
-    },
-    /**
      * @description 登录
      * @param {Object} context
      * @param {Object} payload username {String} 用户账号
@@ -27,15 +15,11 @@ export default {
      */
     async login ({ dispatch }, { // dispatch为actions中特有的方法，用于分发action hsm
       username = '',
-      password = '',
-      check_code = ''
+      password = ''
     } = {}) {
-      const code_token = util.cookies.get('code_token')
       const data = new FormData()
       data.append('username', username)
       data.append('password', password)
-      data.append('check_code', check_code)
-      data.append('code_token', code_token)
       const res = await api.SYS_USER_LOGIN(data) // 等待api请求完成
       console.log(res)
       // 设置 cookie 一定要存 uuid 和 token 两个 cookie
@@ -43,10 +27,10 @@ export default {
       // uuid 是用户身份唯一标识 用户注册的时候确定 并且不可改变 不可重复
       // token 代表用户当前登录状态 建议在网络请求中携带 token
       // 如有必要 token 需要定时更新，默认保存一天
-      util.cookies.set('uuid', res.data.data.UserID)
+      util.cookies.set('uuid', res.data.data.username)
       util.cookies.set('token', res.headers.authorization)
       // 设置 vuex 用户信息
-      await dispatch('d2admin/user/set', { name: res.data.data.UserID }, { root: true }) // 加{ root: true }代表从根节点开始查找，若不加，则'd2admin/user/set'=='account/d2admin/user/set' hsm
+      await dispatch('d2admin/user/set', { name: res.data.data.username }, { root: true }) // 加{ root: true }代表从根节点开始查找，若不加，则'd2admin/user/set'=='account/d2admin/user/set' hsm
       // 用户登录后从持久化数据加载一系列的设置
       await dispatch('load')
     },
@@ -60,6 +44,8 @@ export default {
        * @description 注销
        */
       async function logout () {
+        // 清空后端token数据
+        await api.SYS_USER_LOGOUT()
         // 清空当前登录用户信息 hsm
         await dispatch('d2admin/user/set', {}, { root: true })
         // 删除cookie

@@ -22,44 +22,35 @@ const frameIn = [
         },
         component: _import('system/index')
       },
-      // 路径列表
+      // 查看地块
       {
-        path: 'route-list',
-        name: 'route-list',
+        path: 'field-list',
+        name: 'field-list',
         meta: {
-          title: '路径列表',
+          title: '查看地块',
           auth: true
         },
-        component: _import('route/route-list')
+        component: _import('fieldManagement/viewField')
       },
-      // 版本信息
+      // 添加地块
       {
-        path: 'editon-info',
-        name: 'editon-info',
+        path: 'field-add',
+        name: 'field-add',
         meta: {
-          title: '版本信息',
+          title: '添加地块',
           auth: true
         },
-        component: _import('edition/edition-info')
+        component: _import('fieldManagement/addField')
       },
-      // 作业数据
+      // 农事管理
       {
-        path: 'task-list',
-        name: 'task-list',
+        path: 'farm-management',
+        name: 'farm-management',
         meta: {
-          title: '数据列表',
+          title: '农事管理',
           auth: true
         },
-        component: _import('task/task-list')
-      },
-      {
-        path: 'page3',
-        name: 'page3',
-        meta: {
-          title: '页面 3',
-          auth: true
-        },
-        component: _import('demo/page3')
+        component: _import('farmManagement')
       },
       // 系统 前端日志
       {

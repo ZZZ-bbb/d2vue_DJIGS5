@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view/>
+    <router-view v-if="isShow"></router-view>
   </div>
 </template>
 
@@ -11,13 +11,29 @@ export default {
   watch: {
     '$i18n.locale': 'i18nHandle'
   },
+  provide () {
+    return {
+      reload: this.reload
+    }
+  },
   created () {
     this.i18nHandle(this.$i18n.locale)
+  },
+  data () {
+    return {
+      isShow: true
+    }
   },
   methods: {
     i18nHandle (val, oldVal) {
       util.cookies.set('lang', val)
       document.querySelector('html').setAttribute('lang', val)
+    },
+    reload () {
+      this.isShow = false
+      this.$nextTick(function () {
+        this.isShow = true
+      })
     }
   }
 }
