@@ -1,0 +1,31 @@
+.marker-icon {
+	background: #fff;
+  border-radius: 8px;
+  padding: 4px;
+	}
+.info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  width: 100%;
+}
+.info h4 {
+    margin: 10px 5px;
+    text-align: center
+}
+.info h5 {
+  margin: 0 0 1px;
+}
+.info button {
+  display: block;
+  margin: 0 auto;
+  height: 35px;
+  width: 80%;
+  border-radius: 5px;
+}
+.info button:hover {
+  cursor: pointer;
+}
