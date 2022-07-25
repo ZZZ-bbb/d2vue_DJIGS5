@@ -1,5 +1,5 @@
 <template>
-  <div class="map-container">
+  <d2-container class="map-container">
     <div class="main-content">
       <div class="chart-btn">
         <el-button @click="nextMonth">下个月</el-button>
@@ -76,7 +76,7 @@
         <el-button type="primary" @click="success">确 定</el-button>
       </span>
     </el-dialog>
-  </div>
+  </d2-container>
 </template>
 
 <script>

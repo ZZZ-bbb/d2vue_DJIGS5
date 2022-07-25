@@ -32,6 +32,13 @@ export const menuHeader = supplementPath([
     children: [
       { path: '/farm-management', title: '农事管理' }
     ]
+  },
+  {
+    title: '作业队管理',
+    icon: 'folder-o',
+    children: [
+      { path: '/org-management', title: '任务管理' }
+    ]
   }
 ])
 
@@ -50,6 +57,13 @@ export const menuAside = supplementPath([
     icon: 'folder-o',
     children: [
       { path: '/farm-management', title: '农事管理' }
+    ]
+  },
+  {
+    title: '作业队管理',
+    icon: 'folder-o',
+    children: [
+      { path: '/org-management', title: '任务管理' }
     ]
   }
 ])

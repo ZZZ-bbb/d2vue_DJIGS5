@@ -1,5 +1,5 @@
 <template>
-  <div class="map-container">
+  <d2-container class="map-container">
     <div class="main-content">
       <div id="view-field-map"></div>
     </div>
@@ -23,7 +23,7 @@
         </d2-card>
       </div>
     </div>
-  </div>
+  </d2-container>
 </template>
 
 <script>

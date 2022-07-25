@@ -1,5 +1,5 @@
 <template>
-  <div class="map-container">
+  <d2-container class="map-container">
     <div class="main-content">
       <div class="map_button">
         <div class="map_button_item">
@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </d2-container>
 </template>
 
 <script>
