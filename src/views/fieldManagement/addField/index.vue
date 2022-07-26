@@ -223,11 +223,10 @@ export default {
       height: 100%;
       .form-body {
         height: auto;
-        border: 1px solid hsl(98, 100%, 86%);
-        border-radius: 5%;
-        margin: 5px 10px;
-        background-color: rgb(255, 254, 254);
-        box-shadow: 3px 3px 3px 3px #bbbbbb;
+        border: 2px solid hsl(240, 7%, 79%);
+        border-radius: 1%;
+        margin: 0px 5px 5px 10px;
+        background-color: #EBF1F6;
         .form-content {
           width: 80%;
           text-align: center;

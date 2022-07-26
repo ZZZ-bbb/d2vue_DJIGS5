@@ -21,7 +21,7 @@ export default {
      * @returns res
      */
     async setFarmData (context, data) {
-      const res = await api.SYS_FARMING_SET()
+      const res = await api.SYS_FARMING_SET(data)
       return res
     },
     /**

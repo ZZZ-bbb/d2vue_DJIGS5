@@ -1,6 +1,6 @@
 <template>
-  <div class="item-container" :style="{'border': border}">
-      <el-card>
+  <div class="item-container">
+      <el-card :style="isActive?'background-image: linear-gradient(160deg, rgba(160,189,231,0.3), rgba(160,189,231,0.8))':'background-image: linear-gradient(160deg, #FFFFFF, #EBF1F6)'">
           <div slot="header">
               <slot name="title"></slot>
               <!-- <span>卡片名称</span>
@@ -15,16 +15,20 @@
 
 <script>
 export default {
-  props: ['border'] // :border="activeCard==index?'4px solid hsl(0, 100%, 86%)':'1px solid hsl(98, 100%, 86%)'"
+  props: {
+    isActive: {
+      type: Boolean,
+      default: false
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
   .item-container {
-  height: auto;
-  border-radius: 5%;
-  margin: 5px 10px;
-  background-color: rgb(255, 254, 254);
-  box-shadow: 3px 3px 3px 3px #bbbbbb
+  margin: 0px 5px 5px 10px;
+  }
+  :deep(.el-card) {
+    border: 1px solid hsl(240, 7%, 79%);
   }
 </style>

@@ -9,7 +9,7 @@
       <hr>
       <div id="farm-chart"></div>
       <div id="farm-item">
-        <d2-table :tableData="tableData" :tableColumn="tableColumn"></d2-table>
+        <d2-table :tableData="tableData" :tableColumn="tableColumn" :maxHeight="0.36"></d2-table>
       </div>
     </div>
     <div class="main-aside">
@@ -17,7 +17,7 @@
         <el-button>添加地块</el-button>
       </div>
       <div class="item-card" v-for="(item,index) in field_data" :key="index">
-        <d2-card :border="areaIndex==index?'4px solid hsl(0, 100%, 86%)':'1px solid hsl(98, 100%, 86%)'">
+        <d2-card :isActive="areaIndex==index?true:false">
           <div slot="title">
             <span>{{item.area_name}}</span>
             <el-button style="float: right; padding: 6px" type="primary" @click="showArea(index)">详细</el-button>
@@ -284,15 +284,11 @@ export default {
     },
     closeDialog () {
       this.dialogVisible = false
-      // this.$refs.farmForm.resetFields()
     },
     success () {
       this.$refs.farmForm.validate((valid) => {
         if (valid) {
           this.upload(this.farm_data)
-          // this.chart_data[this.ind][1] = Math.abs(this.chart_data[this.ind][1]-1)
-          // this.$chart.refChart(this.chart_data)
-          this.configure.visible = false
         } else {
           return false
         }
@@ -323,6 +319,7 @@ export default {
       float: left;
       height: 100%;
       width: 74.8%;
+      overflow: hidden;
       .chart-btn {
         height: 30px;
         margin: 8px 10px 0 0;
@@ -335,6 +332,7 @@ export default {
       #farm-chart {
         width: 100%;
         height: 50%;
+        min-height: 300px;
       }
       #farm-item {
         margin-top: 20px;

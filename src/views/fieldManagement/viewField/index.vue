@@ -8,7 +8,7 @@
         <el-button>添加地块</el-button>
       </div>
       <div class="item-card" v-for="(item,index) in field_data" :key="index">
-        <d2-card :border="areaIndex==index?'4px solid hsl(0, 100%, 86%)':'1px solid hsl(98, 100%, 86%)'">
+        <d2-card :isActive="areaIndex==index?true:false">
           <div slot="title">
             <span @click="showFarming(index)">{{item.area_name}}</span>
             <el-button style="float: right; padding: 6px; margin-left:10px" type="danger" @click="delArea(index)">删除</el-button>

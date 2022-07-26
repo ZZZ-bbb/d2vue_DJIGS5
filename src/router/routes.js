@@ -56,55 +56,11 @@ const frameIn = [
       {
         path: 'org-management',
         name: 'org-management',
-        redirect: { name: 'all-orders' },
-        component: _import('orgManagement'),
-        children: [
-          {
-            path: 'all-orders',
-            name: 'all-orders',
-            meta: {
-              title: '任务管理',
-              auth: true
-            },
-            component: _import('orgManagement/allOrders')
-          },
-          {
-            path: 'cancel-orders',
-            name: 'cancel-orders',
-            meta: {
-              title: '任务管理',
-              auth: true
-            },
-            component: _import('orgManagement/cancelOrders')
-          },
-          {
-            path: 'done-orders',
-            name: 'done-orders',
-            meta: {
-              title: '任务管理',
-              auth: true
-            },
-            component: _import('orgManagement/doneOrders')
-          },
-          {
-            path: 'pending-orders',
-            name: 'pending-orders',
-            meta: {
-              title: '任务管理',
-              auth: true
-            },
-            component: _import('orgManagement/pendingOrders')
-          },
-          {
-            path: 'process-orders',
-            name: 'process-orders',
-            meta: {
-              title: '任务管理',
-              auth: true
-            },
-            component: _import('orgManagement/processOrders')
-          }
-        ]
+        meta: {
+          title: '任务管理',
+          auth: true
+        },
+        component: _import('orgManagement')
       },
       // 系统 前端日志
       {

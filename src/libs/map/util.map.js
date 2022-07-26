@@ -122,7 +122,7 @@ var CM = L.layerGroup() // 移动点图层组
 const newPolygon = {
   /**
    * @description 鼠标点击事件，记录点以及绘制辅助线
-   * @param { Object } e 坐标信息
+   * @param {Object} e 坐标信息
    */
   onClick (e) {
     points.push([e.latlng.lat, e.latlng.lng])
@@ -132,7 +132,7 @@ const newPolygon = {
   },
   /**
    * @description 鼠标移动事件，绘制辅助线
-   * @param { Object } e 坐标信息
+   * @param {Object} e 坐标信息
    */
   onMove (e) {
     if (points.length > 0) {
@@ -156,7 +156,7 @@ const newPolygon = {
   },
   /**
    * @description 开始多边形绘制
-   * @param { Object } mapData map实例
+   * @param {Object} mapData map实例
    */
   start (mapData) {
     points = []
@@ -234,7 +234,7 @@ const newPolygon = {
   },
   /**
    * @description 获取多边形地理位置坐标
-   * @returns { Array } 初始点坐标
+   * @returns {Array} 初始点坐标
    */
   getCenter () {
     return points[0]
@@ -253,10 +253,10 @@ const newPolygon = {
   },
   /**
    * @description 显示多边形及相关信息
-   * @param { Object } mapData map实例
-   * @param { Array } points 多边形各点数据
-   * @param { String } [ptext] 点击多边形显示的popup内容，可选
-   * @param { Object } [farmData] 农事信息，可选
+   * @param {Object} mapData map实例
+   * @param {Array} points 多边形各点数据
+   * @param {String | HTMLElement} [ptext] 点击多边形显示的popup内容，可选
+   * @param {Object} [farmData] 农事信息，可选
    */
   showArea (mapData, points, ptext = null, farmData = null) {
     if (geometry.length) {
@@ -282,10 +282,10 @@ const newPolygon = {
 const fileArea = {
   /**
    * @description 已知三角形三点经纬度坐标，计算三角形面积
-   * @param { Array } A A点经纬度坐标
-   * @param { Array } B B点经纬度坐标
-   * @param { Array } C C点经纬度坐标
-   * @returns { Number } area 单位 米
+   * @param {Array} A A点经纬度坐标
+   * @param {Array} B B点经纬度坐标
+   * @param {Array} C C点经纬度坐标
+   * @returns {Number} area 单位 米
    */
   triangleArea (A, B, C) {
     const a = map.distance(B, C)
@@ -297,7 +297,7 @@ const fileArea = {
   },
   /**
    * @description 计算多边形面积
-   * @returns { Number } area
+   * @returns {Number} area
    */
   getArea () {
     const test_points = points
@@ -363,9 +363,9 @@ const fileArea = {
   },
   /**
    * @description 面积计算子函数
-   * @param { String } dire 主方向选择
-   * @param { Array } direction 多边形点方向集合
-   * @returns { Number } area 单位 米
+   * @param {String} dire 主方向选择
+   * @param {Array} direction 多边形点方向集合
+   * @returns {Number} area 单位 米
    */
   polylineArea (dire, direction) {
     // 面积点选择

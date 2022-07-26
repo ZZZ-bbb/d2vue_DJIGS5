@@ -18,7 +18,7 @@ export default ({ service, request, serviceForMock, requestForMock, mock, faker,
     return request({
       url: 'farmManagement/getFarmWork',
       method: 'post',
-      params: data
+      data
     })
   }
 })
