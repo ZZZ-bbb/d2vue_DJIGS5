@@ -6,15 +6,18 @@ import App from './App'
 import d2Admin from '@/plugin/d2admin'
 // store
 import store from '@/store/index'
-
+//leaflets
+import map from '@/libs/map/util.map'
 // 菜单和路由设置
 import router from './router'
 import { menuHeader, menuAside } from '@/menu'
 import { frameInRoutes } from '@/router/routes'
 
+
 // 核心插件
 Vue.use(d2Admin)
 
+Vue.prototype.$map = map;
 new Vue({
   router,
   store,

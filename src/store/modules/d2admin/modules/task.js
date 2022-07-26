@@ -4,6 +4,14 @@ import router from '@/router'
 
 export default {
   namespaced: true,
+  state: {
+    // chart1Data: [],
+  },
+  mutations: {
+    setData (state, data) {
+      state.chart1Data = data
+    }
+  },
   actions: {
     /**
      * @description 获取作业数据
@@ -84,6 +92,9 @@ export default {
     async getTaskBatInfo (context, data) {
       const res = await api.SYS_TASK_GET_BAT_INFO(data)
       return res.data
+    },
+    setChartData ({ commit }, data) {
+      commit('setData', data)
     }
   }
 }

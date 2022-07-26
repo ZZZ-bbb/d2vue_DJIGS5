@@ -98,7 +98,16 @@ const frameOut = [
     path: '/login',
     name: 'login',
     component: _import('system/login')
-  }
+  },
+  {
+    path: '/map',
+    name: 'map',
+    meta: {
+      title: '地图',
+      auth: true
+    },
+    component: _import('task/map')
+  },
 ]
 
 /**

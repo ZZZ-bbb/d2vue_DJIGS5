@@ -3,17 +3,19 @@
     <template slot="header">
       <div class="page-task-upload" flex="main:justify cross:center">
         <div>
-          <d2-icon name="exclamation-circle"/>
-          <span>{{`共有 ${total} 条记录，当前显示第 ${Math.min((currentPage-1)*pageSize+1, total)} 至第 ${Math.min(currentPage*pageSize, total)} 条记录`}}</span>
+          <d2-icon name="exclamation-circle" />
+          <span>{{
+            `共有 ${total} 条记录，当前显示第 ${Math.min(
+              (currentPage - 1) * pageSize + 1,
+              total
+            )} 至第 ${Math.min(currentPage * pageSize, total)} 条记录`
+          }}</span>
         </div>
         <el-button @click="dialogVisible = true">上传数据</el-button>
       </div>
     </template>
     <div class="page-task-table">
-      <d2-table
-        :tableData="taskData"
-        :tableColumn="tableColumn"
-        :sortData="sortData">
+      <d2-table :tableData="taskData" :tableColumn="tableColumn" :sortData="sortData">
       </d2-table>
     </div>
     <div class="page-task-table-pagination">
@@ -23,9 +25,10 @@
         :total="total"
         :current-page="currentPage"
         :page-size="pageSize"
-        :page-sizes="[1,5,10,20]"
+        :page-sizes="[1, 5, 10, 20]"
         @current-change="pageChange"
-        @size-change="handleSizeChange">
+        @size-change="handleSizeChange"
+      >
       </el-pagination>
     </div>
     <el-dialog
@@ -33,7 +36,8 @@
       :visible.sync="dialogVisible"
       :closeOnClickModal="false"
       :destroyOnClose="true"
-      width="25%">
+      width="25%"
+    >
       <el-upload
         ref="upload"
         action="fakeaction"
@@ -42,7 +46,8 @@
         :limit="1"
         :multiple="true"
         :http-request="uploadSectionFile"
-        :on-exceed="handleExceed">
+        :on-exceed="handleExceed"
+      >
         <div slot="tip" class="page-task-upload-tip">只能上传txt格式文件</div>
         <el-button slot="trigger">选择文件</el-button>
       </el-upload>
@@ -57,49 +62,69 @@
       :visible.sync="chartDialogVisible"
       :closeOnClickModal="false"
       :destroyOnClose="true"
-      >
+    >
       <div class="block">
-      <div class="block_left">
-      <div class="page-task-chart-radio" flex="main:center cross:center">
-        <el-radio-group v-model="radio" @change="changeType">
-          <el-radio :label="0">电压（V）</el-radio>
-          <el-radio :label="1">电流（A）</el-radio>
-          <el-radio :label="2">温度（℃）</el-radio>
-          <el-radio :label="3">剩余电量（%）</el-radio>
-          <el-radio :label="4">剩余容量（Ah）</el-radio>
-        </el-radio-group>
-      </div>
-      <div id="chart"></div>
-      <div class="font">作业路线</div>
-      <div class="page-task-chart-radio" flex="main:center cross:center">
-        <el-radio-group v-model="radio1" @change="changeType1">
-          <el-radio :label="0">实际路线</el-radio>
-          <el-radio :label="1">预定路线</el-radio>
-          <!-- <el-radio :label="2">重合展示</el-radio> -->
-        </el-radio-group>
-      </div>
-      <div id="uavchart"></div>
-      </div>
-      <div class="block_right">
-        <el-descriptions title="作业信息" direction="vertical" size="medium" :column="1" border >
-        <el-descriptions-item label="作业ID">{{this.task_id}}</el-descriptions-item>
-        <el-descriptions-item label="上传用户">{{this.UserID}}</el-descriptions-item>
-        <el-descriptions-item label="模式">
-        <el-tag size="small" type="success">施肥</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="状态">
-        <el-tag size="small" type="success">正常</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="作业时间"  :span="3">{{this.filename}}</el-descriptions-item>
-        <el-descriptions-item label="上传时间"  :span="4">{{this.created_at}}</el-descriptions-item>
-        <el-descriptions-item label="作业地址">/</el-descriptions-item>
-        <el-descriptions-item label="异常">/</el-descriptions-item>
-        </el-descriptions>
-        <div style="margin-top:50px;margin-right:30%;">
-          <el-button size="large" type="primary" plain>进入地图</el-button>
-          <el-button @click="chartDialogVisible = false" size="large" type="danger" plain >关闭</el-button>
-        </div> 
-      </div>
+        <div class="block_left">
+          <div class="page-task-chart-radio" flex="main:center cross:center">
+            <el-radio-group v-model="radio" @change="changeType">
+              <el-radio :label="0">电压（V）</el-radio>
+              <el-radio :label="1">电流（A）</el-radio>
+              <el-radio :label="2">温度（℃）</el-radio>
+              <el-radio :label="3">剩余电量（%）</el-radio>
+              <el-radio :label="4">剩余容量（Ah）</el-radio>
+            </el-radio-group>
+          </div>
+          <div id="chart"></div>
+          <div class="font">作业路线</div>
+          <div class="page-task-chart-radio" flex="main:center cross:center">
+            <el-radio-group v-model="radio1" @change="changeType1">
+              <el-radio :label="0">实际路线</el-radio>
+              <el-radio :label="1">预定路线</el-radio>
+              <!-- <el-radio :label="2">重合展示</el-radio> -->
+            </el-radio-group>
+          </div>
+          <div id="uavchart"></div>
+        </div>
+        <div class="block_right">
+          <el-descriptions
+            title="作业信息"
+            direction="vertical"
+            size="medium"
+            :column="1"
+            border
+          >
+            <el-descriptions-item label="作业ID">{{ this.task_id }}</el-descriptions-item>
+            <el-descriptions-item label="上传用户">{{
+              this.UserID
+            }}</el-descriptions-item>
+            <el-descriptions-item label="模式">
+              <el-tag size="small" type="success">施肥</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="状态">
+              <el-tag size="small" type="success">正常</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="作业时间" :span="3">{{
+              this.filename
+            }}</el-descriptions-item>
+            <el-descriptions-item label="上传时间" :span="4">{{
+              this.created_at
+            }}</el-descriptions-item>
+            <el-descriptions-item label="作业地址">/</el-descriptions-item>
+            <el-descriptions-item label="异常">/</el-descriptions-item>
+          </el-descriptions>
+          <div style="margin-top: 50px; margin-right: 30%">
+            <el-button @click="showmap" size="large" type="primary" plain
+              >进入地图</el-button
+            >
+            <el-button
+              @click="chartDialogVisible = false"
+              size="large"
+              type="danger"
+              plain
+              >关闭</el-button
+            >
+          </div>
+        </div>
       </div>
       <!-- <span slot="footer" class="dialog-footer">
         <el-button @click="chartDialogVisible = false">关 闭</el-button>
@@ -109,17 +134,17 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import util from '@/libs/util'
-import echartOption from './echartOption'
+import { mapActions } from "vuex";
+import util from "@/libs/util";
+import echartOption from "./echartOption";
 export default {
-  name: 'task-list',
-  data () {
+  name: "task-list",
+  data() {
     return {
-      task_id: '',
-      UserID: '',
-      filename: '',
-      created_at: '',
+      task_id: "",
+      UserID: "",
+      filename: "",
+      created_at: "",
       chartData: [[], [], [], [], []],
       chart1Data: [[], []],
       radio: 0,
@@ -131,180 +156,220 @@ export default {
       currentPage: 1, // 当前页码
       total: 0, // 总条数
       pageSize: 10, // 每页的数据条数
-      sortData: { prop: 'created_at', order: 'ascending' },
+      sortData: { prop: "created_at", order: "ascending" },
       tableColumn: [
         {
-          prop: '',
-          title: '序号',
-          align: 'center',
+          prop: "",
+          title: "序号",
+          align: "center",
           formatter: (row, column, cellValue, index) => {
-            return index + 1 + (this.currentPage - 1) * this.pageSize
-          }
+            return index + 1 + (this.currentPage - 1) * this.pageSize;
+          },
         },
         {
-          prop: 'task_id',
-          title: 'ID',
-          align: 'center'
+          prop: "task_id",
+          title: "ID",
+          align: "center",
         },
         {
-          prop: 'UserID',
-          title: '发布用户',
-          align: 'center'
+          prop: "UserID",
+          title: "发布用户",
+          align: "center",
         },
         {
-          prop: 'created_at',
-          title: '作业时间',
-          align: 'center',
-          sortable: true
+          prop: "created_at",
+          title: "作业时间",
+          align: "center",
+          sortable: true,
         },
         {
-          prop: '',
-          title: '操作',
-          align: 'center',
+          prop: "",
+          title: "操作",
+          align: "center",
           formatter: (row, column, cellValue, index) => {
             return (
               <div flex="main:center">
                 <el-button
                   plain
-                  style='padding: 6px'
-                  type='primary'
-                  onClick={ this.showData.bind(this, row) }
+                  style="padding: 6px"
+                  type="primary"
+                  onClick={this.showData.bind(this, row)}
                 >
                   查看
                 </el-button>
                 <el-button
                   plain
-                  style= 'padding: 6px'
-                  type='primary'
-                  onClick={ this.downloadData.bind(this, row) }
+                  style="padding: 6px"
+                  type="primary"
+                  onClick={this.downloadData.bind(this, row)}
                 >
                   下载
                 </el-button>
                 <el-button
                   plain
-                  style= 'padding: 6px'
-                  type='danger'
-                  onClick={ this.deleteData.bind(this, row) }
+                  style="padding: 6px"
+                  type="danger"
+                  onClick={this.deleteData.bind(this, row)}
                 >
                   删除
                 </el-button>
               </div>
-            )
-          }
-        }
-      ]
-    }
+            );
+          },
+        },
+      ],
+    };
   },
-  mounted () {
-    this.getData()
+  mounted() {
+    this.getData();
   },
   methods: {
-    ...mapActions('d2admin/task', [
-      'getTaskData', 'deleteTaskData', 'downloadTaskData',
-      'getTaskDetail', 'getTaskUavInfo', 'getTaskBatInfo'
+    ...mapActions("d2admin/task", [
+      "getTaskData",
+      "deleteTaskData",
+      "downloadTaskData",
+      "getTaskDetail",
+      "getTaskUavInfo",
+      "getTaskBatInfo",
     ]),
-    ...mapActions('d2admin/uploader', [
-      'pushTmp'
-    ]),
-    getData () {
-      this.getTaskData({ page: this.currentPage, list_num: this.pageSize }).then(res => {
-        this.total = res.data.count
-        this.taskData = res.data.data
-      })
-    },
-    showData (row) {
-      function dueData (arr, time) {
-        return arr.filter((val, index) => {
-          return index % 10 === 0
-        }).map((val, index) => {
-          return [time + index * 1000, val]
-        })
-      }
-      this.chartData = [[], [], [], [], []]
-      this.chart1Data = [[], [], []]
-      const task_id = row.task_id
-      this.chartDialogVisible = true
-      this.getTaskBatInfo({ task_id }).then((res) => {
-        const resData = res.data
-        for (const tmp in resData) {
-          const timeData = Date.parse(resData[tmp].time)
-          this.chartData[0] = this.chartData[0].concat(dueData(resData[tmp].V, timeData))
-          this.chartData[1] = this.chartData[1].concat(dueData(resData[tmp].A, timeData))
-          this.chartData[2] = this.chartData[2].concat(dueData(resData[tmp].T, timeData))
-          this.chartData[3] = this.chartData[3].concat(dueData(resData[tmp].rP, timeData))
-          this.chartData[4] = this.chartData[4].concat(dueData(resData[tmp].rA, timeData))
+    ...mapActions("d2admin/uploader", ["pushTmp"]),
+    getData() {
+      this.getTaskData({ page: this.currentPage, list_num: this.pageSize }).then(
+        (res) => {
+          this.total = res.data.count;
+          this.taskData = res.data.data;
         }
-        util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: this.chartData[this.radio] } }))
-      })
+      );
+    },
+    showData(row) {
+      function dueData(arr, time) {
+        return arr
+          .filter((val, index) => {
+            return index % 10 === 0;
+          })
+          .map((val, index) => {
+            return [time + index * 1000, val];
+          });
+      }
+      this.chartData = [[], [], [], [], []];
+      this.chart1Data = [[], [], []];
+      const task_id = row.task_id;
+      this.chartDialogVisible = true;
+      this.getTaskBatInfo({ task_id }).then((res) => {
+        const resData = res.data;
+        for (const tmp in resData) {
+          const timeData = Date.parse(resData[tmp].time);
+          this.chartData[0] = this.chartData[0].concat(dueData(resData[tmp].V, timeData));
+          this.chartData[1] = this.chartData[1].concat(dueData(resData[tmp].A, timeData));
+          this.chartData[2] = this.chartData[2].concat(dueData(resData[tmp].T, timeData));
+          this.chartData[3] = this.chartData[3].concat(
+            dueData(resData[tmp].rP, timeData)
+          );
+          this.chartData[4] = this.chartData[4].concat(
+            dueData(resData[tmp].rA, timeData)
+          );
+        }
+        util.echarts.init(
+          "chart",
+          Object.assign(echartOption.batInfo, {
+            dataset: { source: this.chartData[this.radio] },
+          })
+        );
+      });
       this.getTaskUavInfo({ task_id }).then((res) => {
-        var a = []
-        var d = []
+        var a = [];
+        var d = [];
         for (var i in res.data.latlng) {
-          var bi = res.data.latlng[i].split(',')
-          a.push(bi)
+          var bi = res.data.latlng[i].split(",");
+          a.push(bi);
         }
         for (var j in res.data.latlng_route) {
-          var ci = res.data.latlng_route[j].split(',')
-          d.push(ci)
+          var ci = res.data.latlng_route[j].split(",");
+          d.push(ci);
         }
-        this.chart1Data[0] = a
-        this.chart1Data[1] = d
-        util.echarts.init('uavchart', Object.assign(echartOption.uavInfo, { dataset: { source: this.chart1Data[this.radio1] } }))
-      })
-      this.task_id = row.task_id
-      this.created_at = row.created_at
-      this.filename = row.filename.split(".")[0].replace("年","-").replace("月","-").replace("时",":").replace("分",":")
-      this.UserID = row.UserID
-      console.log(this.task_id)
+        this.chart1Data[0] = a;
+        this.chart1Data[1] = d;
+        util.echarts.init(
+          "uavchart",
+          Object.assign(echartOption.uavInfo, {
+            dataset: { source: this.chart1Data[this.radio1] },
+          })
+        );
+      });
+      this.task_id = row.task_id;
+      this.created_at = row.created_at;
+      this.filename = row.filename
+        .split(".")[0]
+        .replace("年", "-")
+        .replace("月", "-")
+        .replace("时", ":")
+        .replace("分", ":");
+      this.UserID = row.UserID;
     },
-    downloadData (row) {
-      const task_id = row.task_id
-      this.downloadTaskData(task_id)
+    showmap() {
+      this.$router.push({
+        path: "/map",
+        query: { task_id: this.task_id, UserID: this.UserID, filename: this.filename, created_at: this.created_at ,chart1Data:this.chart1Data},
+      });
     },
-    deleteData (row) {
-      const task_id = row.task_id
-      this.deleteTaskData({ task_id })
+    downloadData(row) {
+      const task_id = row.task_id;
+      this.downloadTaskData(task_id);
     },
-    uploadData () {
+    deleteData(row) {
+      const task_id = row.task_id;
+      this.deleteTaskData({ task_id });
+    },
+    uploadData() {
       if (this.$refs.upload.uploadFiles.length === 0) {
-        this.$message.warning('请选择文件')
+        this.$message.warning("请选择文件");
       } else {
-        this.$refs.upload.submit()
+        this.$refs.upload.submit();
       }
     },
-    uploadSectionFile (params) {
-      const file = params.file
-      const fileType = file.type
-      const isText = fileType.indexOf('text') !== -1
+    uploadSectionFile(params) {
+      const file = params.file;
+      const fileType = file.type;
+      const isText = fileType.indexOf("text") !== -1;
       if (!isText) {
-        this.$refs.upload.clearFiles()
-        return this.$message.error('请上传txt格式文件')
+        this.$refs.upload.clearFiles();
+        return this.$message.error("请上传txt格式文件");
       }
-      this.pushTmp({ file, type: 'task' })
-      this.dialogVisible = false
+      this.pushTmp({ file, type: "task" });
+      this.dialogVisible = false;
     },
-    handleExceed (files, fileList) {
-      this.$message.warning('当前限制选择 1 个文件')
+    handleExceed(files, fileList) {
+      this.$message.warning("当前限制选择 1 个文件");
     },
-    pageChange (val) {
-      this.currentPage = val
-      this.getData()
+    pageChange(val) {
+      this.currentPage = val;
+      this.getData();
     },
-    handleSizeChange (val) {
-      this.currentPage = 1
-      this.pageSize = val
-      this.getData()
+    handleSizeChange(val) {
+      this.currentPage = 1;
+      this.pageSize = val;
+      this.getData();
     },
-    changeType (value) {
-      util.echarts.init('chart', Object.assign(echartOption.batInfo, { dataset: { source: this.chartData[this.radio] } }))
+    changeType(value) {
+      util.echarts.init(
+        "chart",
+        Object.assign(echartOption.batInfo, {
+          dataset: { source: this.chartData[this.radio] },
+        })
+      );
     },
-    changeType1 (value) {
-      util.echarts.init('uavchart', Object.assign(echartOption.uavInfo, { dataset: { source: this.chart1Data[this.radio1] } }))
-      console.log(this.chartData[this.radio])
-      console.log(this.chart1Data[this.radio])
-    }
-  }
-}
+    changeType1(value) {
+      util.echarts.init(
+        "uavchart",
+        Object.assign(echartOption.uavInfo, {
+          dataset: { source: this.chart1Data[this.radio1] },
+        })
+      );
+      console.log(this.chartData[this.radio]);
+      console.log(this.chart1Data[this.radio]);
+    },
+  },
+};
 </script>
 <style lang="scss" scoped>
 .page-task-table-pagination {
@@ -316,22 +381,22 @@ export default {
   color: #606266;
   margin-top: 7px;
 }
-.block{
+.block {
   position: absolute;
   width: 100%;
   height: 100%;
 }
-.block_left{
+.block_left {
   width: 50%;
   float: left;
 }
-.block_right{
+.block_right {
   margin-right: 250px;
   float: right;
   width: 30%;
   text-align: left;
 }
-.font{
+.font {
   font-size: 20px;
   font-family: "微软雅黑", Arial;
 }

@@ -9,10 +9,12 @@ L.Icon.Default.mergeOptions({
   iconUrl: require('leaflet/dist/images/marker-icon.png'),
   shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 })
-
+var radio = "A"
 var map = '' // 地图实例
 var fieldInfo = '' // 信息控件实例
-
+var filedMapInfo = '' //地图信息实例
+var filedMapChoosen = "" //地图选项实例
+var tileL = ""
 /**
  * @description 创建地图实例
  * @param {String} domId 容器ID
@@ -27,8 +29,39 @@ const newMap = (domId, option) => {
   L.control.scale({
     imperial: false
   }).addTo(map)
+
+  map.on('preclick', e => {
+    var url
+    var maplist = document.getElementsByName("map")
+    for (var i in maplist) {
+      console.log(maplist[i].checked);
+      if(maplist[i].checked){
+        url = maplist[i].value
+        tileL.setUrl(url).addTo(map)
+      }
+    }
+  })
+  map.on("zoom", e => {
+    addMapInfo(map)
+  })
+  map.on('move', e => {
+    addMapInfo(map)
+  })
+  addMapChoosen(map)
   return map
 }
+
+/**
+ * @description 创建path图层
+ * @param {String}  data  路径点数据
+ * @param {Object} option 路线样式
+ * @returns {Object} map实例
+ */
+const showLine = (data, option, map) => {
+  const path = L.polyline(data, option).addTo(map)
+  map.fitBounds(path.getBounds());
+}
+
 
 /**
  * @description 添加瓦片图层
@@ -38,9 +71,20 @@ const newMap = (domId, option) => {
  * @returns {Object} newLayer
  */
 const createLayer = (map, url, option) => {
-  const newLayer = L.tileLayer(url, option).addTo(map)
+  tileL = L.tileLayer(url, option)
+  const newLayer = tileL.addTo(map)
   return newLayer
 }
+
+
+
+
+
+
+
+
+
+
 
 /**
  * @description 右上角添加信息控件,内容为地块种植情况
@@ -48,13 +92,6 @@ const createLayer = (map, url, option) => {
  * @param {Object} info info
  */
 const addInfo = (map, info) => {
-  // info处理
-  let farming_flg = 0
-  if (info.length) {
-    if (info[0].farming_type === '播种') {
-      farming_flg = 1
-    }
-  }
   // 自定义信息控件
   L.Control.FieldInfo = L.Control.extend({
     options: {
@@ -62,20 +99,16 @@ const addInfo = (map, info) => {
     },
     onAdd: function () { // L.Control原生方法，使用addTo()时调用该方法
       this._container = L.DomUtil.create('div', 'info')
-      if (farming_flg === 1) {
-        this._container.innerHTML = `
-          <h4>种植信息</h4><hr></br>
-          <h5>品种: ${info[0].rice_type}</h5></br>
-          <h5>播种时间：${info[0].farming_time}</h5></br>
-          <button onClick="location.href = '#/home/farm-management'">农事管理</button>
-        ` // 播种信息
-      } else {
-        this._container.innerHTML = `
-          <h4>种植信息</h4><hr></br>
-          <h4 style="color: #777">未播种</h4></br>
-          <button onClick="location.href = '#/farm-management'">农事管理</button>
-        ` // 未播种信息
-      }
+      this._container.innerHTML = `
+        <h4>作业信息</h4><hr></br>
+        <h5>作业ID: ${info.task_id}</h5></br>
+        <h5>作业时间：${info.filename}</h5></br>
+        <h5>上传时间：${info.created_at}</h5></br>
+        <h5>作业时间：${info.filename}</h5></br>
+        <h5>模式：${"施肥"}</h5></br>
+        <h5>状态：${"正常"}</h5></br>
+        <h5>作业地址：${"/"}</h5></br>
+        `
       return this._container
     },
     onRemove: function () { // L.Control原生方法，使用remove()时调用该方法
@@ -87,14 +120,109 @@ const addInfo = (map, info) => {
     return new L.Control.FieldInfo(options)
   }
 
-  if (fieldInfo !== '' && fieldInfo !== undefined && fieldInfo !== null) {
-    fieldInfo.remove()
-  }
+  // if (fieldInfo !== '' && fieldInfo !== undefined && fieldInfo !== null) {
+  //   fieldInfo.remove()
+  // }
 
   fieldInfo = L.control.fieldInfo({
-  // 此处设置options，将替换掉上方原始options
+    // 此处设置options，将替换掉上方原始options
   }).addTo(map)
 }
+
+
+
+
+
+/**
+ * @description 左下角上角添加信息控件,内容为地块种植情况
+ * @param {Object} map map实例
+ * @param {Object} info info
+ */
+const addMapChoosen = (map) => {
+  // 自定义信息控件
+  L.Control.FieldInfo = L.Control.extend({
+    options: {
+      position: 'topright'
+    },
+    onAdd: function () { // L.Control原生方法，使用addTo()时调用该方法
+      this._container = L.DomUtil.create('div', 'info')
+      this._container.innerHTML = `
+      <form class="mapClass">
+      <label class="single"><input type="radio" name="map" value="https://api.mapbox.com/styles/v1/764371741/cl104r88t006415od03t8itpo/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiNzY0MzcxNzQxIiwiYSI6ImNsMHZ3Y2V5bjBuZWQzY210ZDBuOWh1ejIifQ.ZrfiUT3M-7HVGdWdWb1pCQ" checked/>MapBox</label>
+      <label class="single"><input type="radio" name="map" value="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />leaflet地图</label>
+      <label class="single"><input type="radio" name="map" value="https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}" />高德地图</label>
+      <label class="single"><input type="radio" name="map" value="http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}" />谷歌地图</label>
+      </form>
+        `
+      return this._container
+    },
+    onRemove: function () { // L.Control原生方法，使用remove()时调用该方法
+      L.DomUtil.remove(this._container)
+    }
+  })
+  // 添加到L.control 控件中，注意这里是小写
+  L.control.fieldInfo = function (options) {
+    return new L.Control.FieldInfo(options)
+  }
+
+  // if (fieldInfo !== '' && fieldInfo !== undefined && fieldInfo !== null) {
+  //   fieldInfo.remove()
+  // }
+
+  fieldInfo = L.control.fieldInfo({
+    // 此处设置options，将替换掉上方原始options
+  }).addTo(map)
+}
+
+
+
+
+
+
+
+/**
+ * @description 左下角上角添加信息控件,内容为地块种植情况
+ * @param {Object} map map实例
+ * @param {Object} info info
+ */
+const addMapInfo = (map) => {
+  var center = map.getCenter()
+  var zoom = map.getZoom()
+  // 自定义信息控件
+  L.Control.FieldInfo = L.Control.extend({
+    options: {
+      position: 'bottomleft'
+    },
+    onAdd: function () { // L.Control原生方法，使用addTo()时调用该方法
+      this._container = L.DomUtil.create('div', 'info')
+      this._container.innerHTML = `
+        <h4>地图: MapBox</h4><hr></br>
+        <h5>放大倍数: ${zoom}</h5></br>
+        <h5>中心点：${center}</h5></br>       
+        `
+      return this._container
+    },
+    onRemove: function () { // L.Control原生方法，使用remove()时调用该方法
+      L.DomUtil.remove(this._container)
+    }
+  })
+  // 添加到L.control 控件中，注意这里是小写
+  L.control.FieldInfo = function (options) {
+    return new L.Control.FieldInfo(options)
+  }
+
+  if (filedMapInfo !== '' && filedMapInfo !== undefined && filedMapInfo !== null) {
+    filedMapInfo.remove()
+  }
+
+  filedMapInfo = L.control.fieldInfo({
+    // 此处设置options，将替换掉上方原始options
+  }).addTo(map)
+}
+
+
+
+
 
 // 鼠标坐标位置信息
 // fixme
@@ -124,7 +252,7 @@ const newPolygon = {
    * @description 鼠标点击事件，记录点以及绘制辅助线
    * @param { Object } e 坐标信息
    */
-  onClick (e) {
+  onClick(e) {
     points.push([e.latlng.lat, e.latlng.lng])
     lines.addLatLng(e.latlng)
     map.addLayer(tempLines)
@@ -134,7 +262,7 @@ const newPolygon = {
    * @description 鼠标移动事件，绘制辅助线
    * @param { Object } e 坐标信息
    */
-  onMove (e) {
+  onMove(e) {
     if (points.length > 0) {
       // 最新点、当前点、原点
       const ls = [points[points.length - 1], [e.latlng.lat, e.latlng.lng], points[0]]
@@ -144,7 +272,7 @@ const newPolygon = {
   /**
    * @description 鼠标右键，结束多边形绘制，同时解除鼠标事件
    */
-  onContextmenu () {
+  onContextmenu() {
     geometry.push(L.polygon(points).addTo(map))
     lines.remove()
     tempLines.remove()
@@ -158,7 +286,7 @@ const newPolygon = {
    * @description 开始多边形绘制
    * @param { Object } mapData map实例
    */
-  start (mapData) {
+  start(mapData) {
     points = []
     map = mapData
     map.on('click', this.onClick)
@@ -169,7 +297,7 @@ const newPolygon = {
    * @description 结束多边形绘制
    * @returns { String } 多边形各点坐标数据
    */
-  end () {
+  end() {
     CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
@@ -180,7 +308,7 @@ const newPolygon = {
    * @description 移动点索引获取
    * @param { Object } e 坐标信息
    */
-  movePoint (e) {
+  movePoint(e) {
     const oldPoint = [e.oldLatLng.lat, e.oldLatLng.lng]
     if (ind === -1) {
       for (let i = 0; i < points.length; i++) {
@@ -209,7 +337,7 @@ const newPolygon = {
   /**
    * @description 更新移动后的图形
    */
-  updataPolygon () {
+  updataPolygon() {
     tempLines.remove()
     tempLines = L.polyline([], { dashArray: 5 })
     ind = -1
@@ -218,7 +346,7 @@ const newPolygon = {
   /**
    * @description 多边形编辑
    */
-  edit () {
+  edit() {
     if (points.length > 1) {
       for (const point of points) {
         CM.addLayer(
@@ -236,13 +364,13 @@ const newPolygon = {
    * @description 获取多边形地理位置坐标
    * @returns { Array } 初始点坐标
    */
-  getCenter () {
+  getCenter() {
     return points[0]
   },
   /**
    * @description 重新绘制多边形
    */
-  reset () {
+  reset() {
     CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
@@ -258,7 +386,7 @@ const newPolygon = {
    * @param { String } [ptext] 点击多边形显示的popup内容，可选
    * @param { Object } [farmData] 农事信息，可选
    */
-  showArea (mapData, points, ptext = null, farmData = null) {
+  showArea(mapData, points, ptext = null, farmData = null) {
     if (geometry.length) {
       geometry[0].removeFrom(mapData)
       geometry = []
@@ -287,7 +415,7 @@ const fileArea = {
    * @param { Array } C C点经纬度坐标
    * @returns { Number } area 单位 米
    */
-  triangleArea (A, B, C) {
+  triangleArea(A, B, C) {
     const a = map.distance(B, C)
     const b = map.distance(A, C)
     const c = map.distance(A, B)
@@ -299,7 +427,7 @@ const fileArea = {
    * @description 计算多边形面积
    * @returns { Number } area
    */
-  getArea () {
+  getArea() {
     const test_points = points
     const direction = [] // 方向标识
     let cosx = null // 坐标系转换用cos值
@@ -367,7 +495,7 @@ const fileArea = {
    * @param { Array } direction 多边形点方向集合
    * @returns { Number } area 单位 米
    */
-  polylineArea (dire, direction) {
+  polylineArea(dire, direction) {
     // 面积点选择
     const points_b = []
     const points_s = []
@@ -443,4 +571,4 @@ const fileArea = {
   }
 }
 
-export default { newMap, createLayer, newPolygon, fileArea }
+export default { newMap, createLayer, newPolygon, fileArea, addInfo, showLine, addMapChoosen }
