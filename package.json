@@ -25,6 +25,7 @@
     "jquery": "^3.6.0",
     "js-cookie": "^2.2.1",
     "leaflet": "^1.8.0",
+    "leaflet.chinatmsproviders": "^3.0.6",
     "leaflet.pm": "^2.2.0",
     "lodash": "^4.17.19",
     "lowdb": "^1.0.0",

@@ -39,9 +39,6 @@ export default {
     // ...mapState("d2admin/task", ["chart1Data"]),
   },
   methods: {
-    getValue() {
-      console.log(1111);
-    },
     getMap() {
       this.info.task_id = this.$route.query.task_id;
       this.info.UserID = this.$route.query.UserID;

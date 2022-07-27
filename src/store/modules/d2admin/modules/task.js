@@ -23,6 +23,15 @@ export default {
       return res.data
     },
     /**
+     * @description 获取wms图层名
+     * @param {Object} context
+     * @param {Object} data data
+     */
+     async getLayerData (context, data) {
+      const res = await api.SYS_MAP_LAYER_GET(data)
+      return res.data
+    },
+    /**
      * @description 删除作业文件
      * @param {Object} context
      * @param {Object} data task_id {String} 作业id
