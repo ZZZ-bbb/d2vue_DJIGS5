@@ -106,9 +106,8 @@ export default {
           prop: 'farming_type',
           title: '作业种类',
           align: 'center',
-          sortable: true,
-          filters: [{ text: '播种', value: '播种' }, { text: '施肥', value: '施肥' }]
-
+          filters: [{ text: '播种', value: '播种' }, { text: '施肥', value: '施肥' }],
+          filterMethod (value, row) { return row.farming_type === value }
         },
         {
           prop: 'farming_time',
@@ -170,6 +169,7 @@ export default {
     getFarmWork () {
       this.getWorkData({ type: 'all' }).then(res => {
         this.farm_data = res.data.data
+        console.log(this.farm_data)
       })
     },
     getFarmWorkNum () {

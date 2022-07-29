@@ -79,6 +79,9 @@ export default {
         }
         if (this.field_data.length) {
           this.getFarmWork(this.field_data[this.areaIndex].area_id)
+        } else {
+          this.$message.warning('请添加第一个地块')
+          this.$router.push('/field-add')
         }
       })
     },

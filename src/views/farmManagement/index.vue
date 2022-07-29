@@ -164,7 +164,7 @@ export default {
                   type="danger"
                   // Click={this.handleDownload.bind(this, row.farm_work_id)}
                 >
-                  删除
+                  取消
                 </el-button>
               </div>
             )
