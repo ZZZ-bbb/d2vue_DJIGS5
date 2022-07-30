@@ -231,7 +231,7 @@ export default {
     uploadSectionFile (params) {
       const file = params.file
       const fileName = file.name
-      const isGeojson = /^\w*\.geojson$/.test(fileName)
+      const isGeojson = /\.geojson$/.test(fileName)
       if (!isGeojson) {
         this.$refs.upload.clearFiles()
         return this.$message.error('请上传geojson格式文件')
