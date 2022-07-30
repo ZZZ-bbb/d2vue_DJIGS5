@@ -183,7 +183,7 @@ export default {
       })
     },
     openMs () {
-      this.$message({
+      this.$message.warning({
         message: '请点击鼠标左键绘制地块，右键结束绘制',
         duration: 6000,
         showClose: true

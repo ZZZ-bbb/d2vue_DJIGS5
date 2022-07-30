@@ -62,6 +62,16 @@ const frameIn = [
         },
         component: _import('orgManagement')
       },
+      // 处方管理
+      {
+        path: 'Rx-management',
+        name: 'Rx-management',
+        meta: {
+          title: '处方列表',
+          auth: true
+        },
+        component: _import('RxManagement')
+      },
       // 系统 前端日志
       {
         path: 'log',

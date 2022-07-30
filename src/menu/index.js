@@ -41,6 +41,13 @@ export const menuHeader = supplementPath([
     ]
   },
   {
+    title: '处方管理',
+    icon: 'folder-o',
+    children: [
+      { path: '/Rx-management', title: '处方列表' }
+    ]
+  },
+  {
     title: '农资管理',
     icon: 'folder-o',
     children: [
@@ -71,6 +78,13 @@ export const menuAside = supplementPath([
     icon: 'folder-o',
     children: [
       { path: '/org-management', title: '任务管理' }
+    ]
+  },
+  {
+    title: '处方管理',
+    icon: 'folder-o',
+    children: [
+      { path: '/Rx-management', title: '处方列表' }
     ]
   },
   {

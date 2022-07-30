@@ -31,5 +31,11 @@ export default ({ service, request, serviceForMock, requestForMock, mock, faker,
       method: 'post',
       data
     })
+  },
+  SYS_FIELD_GET_BY_RX () {
+    return request({
+      url: 'plantArea/getAreaListByRx',
+      method: 'get'
+    })
   }
 })

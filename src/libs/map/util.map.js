@@ -150,9 +150,9 @@ const newPolygon = {
     tempLines.remove()
     lines = L.polyline([])
     tempLines = L.polyline([], { dashArray: 5 })
-    map.off('click', this.onClick)
-    map.off('contextmenu', this.onContextmenu)
-    map.off('mousemove', this.onMove)
+    map.off('click')
+    map.off('contextmenu')
+    map.off('mousemove')
   },
   /**
    * @description 开始多边形绘制
@@ -170,7 +170,7 @@ const newPolygon = {
    * @returns { String } 多边形各点坐标数据
    */
   end () {
-    CM.off('move', this.movePoint)
+    // CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
     CM = L.layerGroup()
@@ -243,7 +243,7 @@ const newPolygon = {
    * @description 重新绘制多边形
    */
   reset () {
-    CM.off('move', this.movePoint)
+    // CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
     CM = L.layerGroup()
