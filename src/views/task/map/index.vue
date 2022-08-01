@@ -21,14 +21,19 @@ export default {
       layerOption: {
         zoomOffset: -1,
         tileSize: 512,
-        maxZoom: 20,
+        maxZoom: 100,
+        minNativeZoom: 0,
+        maxNativeZoom: 100
       },
       mapOption: {
         center: [23.15763794413284, 113.34546817452538], // 需要添加获取定位
-        zoom: 18,
-        zoomControl: true,
-        doubleClickZoom: false,
+        maxNativeZoom: 18,
+        maxZoom: 100,
+        minZoom: 3,
+        zoom: 22,
+        zoomControl: false,
         attributionControl: false,
+        crs: L.CRS.EPSG3857,
       },
     };
   },

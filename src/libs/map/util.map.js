@@ -1,7 +1,7 @@
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './map.css'
-import {request} from '@/api/service'
+import { request } from '@/api/service'
 
 
 // 定义默认图标路径
@@ -18,6 +18,7 @@ var filedMapInfo = '' //地图信息实例
 var filedMapChoosen = "" //地图选项实例
 var tileL = ""
 var layerGroups = "" //高清地图图层
+var layername = ""
 /**
  * @description 创建地图实例
  * @param {String} domId 容器ID
@@ -32,7 +33,13 @@ const newMap = (domId, option) => {
   L.control.scale({
     imperial: false
   }).addTo(map)
-  layerGroups = new L.FeatureGroup().addTo(map)
+  layerGroups = new L.FeatureGroup({
+    zoomOffset: -1,
+    tileSize: 512,
+    maxZoom: 100,
+    minNativeZoom: 0,
+    maxNativeZoom: 100
+  }).addTo(map)
   map.on('preclick', e => {
     var url
     var maplist = document.getElementsByName("map")
@@ -51,60 +58,66 @@ const newMap = (domId, option) => {
 
   })
   map.on('mouseup', e => {
-    layerGroups.clearLayers();
-    var zoom = map.getZoom();
-    if (zoom < 12) {
-      console.log("放大倍数过小！");
-      console.log("放大倍数过小");
-    } else {
-      var cen = map.getCenter();
-      var size = map.getSize();
-      var SouthWest = map.getBounds();
-      var leftdown =
-        map.getBounds().getSouthWest().lng +
-        "," +
-        map.getBounds().getSouthWest().lat;
-      var vfirstside = cen.lng - map.getBounds().getSouthWest().lng;
-      var vsecendside = cen.lat - map.getBounds().getSouthWest().lat;
-      var viewR = vfirstside * vfirstside + vsecendside * vsecendside;
-      var params = {
-        viewZoom: zoom,
-        viewPointLat: cen.lat,
-        viewPointLng: cen.lng,
-        viewR: viewR,
-      };
-      console.log("params:" + params.viewZoom);
-      console.log("cenlat:" + params.viewPointLat);
-      console.log("cenlng:" + params.viewPointLng);
-      console.log("vr:" + params.viewR);
-      request({
-        url: 'http://106.55.229.44:443/api/map/get_layer',
-        method: 'get',
-        params: params
-      }).then((res) => {
-        console.log(res.data);
-        if (res.data.size==0){
-          return
-        }
-        for (var i in res.data.data) {
-          var a = L.tileLayer
-            .wms("https://shifei.scau.edu.cn:8443/geoserver/rice/wms", {
-              layers: res.data.data[i],
-              transparent: true,
-              format: "image/png",
-              crs: L.CRS.EPSG4326,
-            })
-            .addTo(map);
-          layerGroups.addLayer(a);
-          console.log(res.data.data[i]);
-        }
-      });
-
-      console.log("center:" + cen);
-      console.log("size:" + size);
-      console.log("zoom:" + zoom);
-      console.log("SouthWest:" + SouthWest);
-      console.log("leftdown:" + leftdown);
+    var HDmap = document.getElementsByName("HDmap")
+    // console.log(HDmap[0].checked);
+    if (HDmap[0].checked) {
+      var zoom = map.getZoom();
+      if (zoom < 12) {
+        console.log("放大倍数过小！");
+        console.log("放大倍数过小");
+      } else {
+        var cen = map.getCenter();
+        var size = map.getSize();
+        var SouthWest = map.getBounds();
+        var leftdown =
+          map.getBounds().getSouthWest().lng +
+          "," +
+          map.getBounds().getSouthWest().lat;
+        var vfirstside = cen.lng - map.getBounds().getSouthWest().lng;
+        var vsecendside = cen.lat - map.getBounds().getSouthWest().lat;
+        var viewR = vfirstside * vfirstside + vsecendside * vsecendside;
+        var params = {
+          viewZoom: zoom,
+          viewPointLat: cen.lat,
+          viewPointLng: cen.lng,
+          viewR: viewR,
+        };
+        // console.log("params:" + params.viewZoom);
+        // console.log("cenlat:" + params.viewPointLat);
+        // console.log("cenlng:" + params.viewPointLng);
+        // console.log("vr:" + params.viewR);
+        request({
+          url: 'http://106.55.229.44:443/api/map/get_layer',
+          method: 'get',
+          params: params
+        }).then((res) => {
+          if (res.data.size == 0 ||  _.isEqual(res.data.data, layername)){
+            return
+          }
+          layerGroups.clearLayers();
+          for (var i in res.data.data) {
+            layername = res.data.data
+            var a = L.tileLayer
+              .wms("http://106.55.229.44:8888/geoserver/bottom_layer/wms", {
+                layers: res.data.data[i] + ".tif",
+                service: "WMS",
+                transparent: true,
+                format: "image/png",
+                crs: L.CRS.EPSG4326,
+                maxZoom: 100
+              })
+              .addTo(map);
+            layerGroups.addLayer(a);
+            // console.log(layerGroups);
+            // console.log(res.data.data[i]);
+          }
+        });
+        // console.log("center:" + cen);
+        // console.log("size:" + size);
+        // console.log("zoom:" + zoom);
+        // console.log("SouthWest:" + SouthWest);
+        // console.log("leftdown:" + leftdown);
+      }
     }
   })
   addMapChoosen(map)
@@ -130,7 +143,7 @@ const showLine = (data, option, map) => {
  * @returns {Object} newLayer
  */
 const createLayer = (map, url, option) => {
-  console.log(option);
+  // console.log(option);
   tileL = L.tileLayer(url, option)
   const newLayer = tileL.addTo(map)
   return newLayer
@@ -199,6 +212,8 @@ const addMapChoosen = (map) => {
       <label class="single"><input type="radio" name="map" value="https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}" />高德地图</label>
       <label class="single"><input type="radio" name="map" value="http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}" />谷歌地图</label>
       </form>
+      <hr>
+      <h4>高清地图<input name="HDmap" type="checkbox" checked></h4>
         `
       return this._container
     },
@@ -236,7 +251,7 @@ const addMapInfo = (map) => {
     onAdd: function () { // L.Control原生方法，使用addTo()时调用该方法
       this._container = L.DomUtil.create('div', 'info')
       this._container.innerHTML = `
-        <h4>地图: MapBox</h4><hr></br>
+        <h4>地图信息</h4><hr></br>
         <h5>放大倍数: ${zoom}</h5></br>
         <h5>中心点：${center}</h5></br>       
         `
