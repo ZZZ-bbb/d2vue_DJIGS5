@@ -1,28 +1,28 @@
 <template>
-  <d2-container class="map-container">
-    <div class="main-content">
-      <div class="chart-btn">
+  <d2-container class="page-farm">
+    <div class="page-farm--content">
+      <div class="page-farm--content-btn">
         <el-button @click="nextMonth">下个月</el-button>
         <el-button style="border-left:0; border-right:0;" @click="getToday">今天</el-button>
         <el-button @click="lastMonth">上个月</el-button>
       </div>
-      <hr>
+      <div class="papge-farm--content-hr"></div>
       <div id="farm-chart"></div>
-      <div id="farm-item">
-        <d2-table :tableData="tableData" :tableColumn="tableColumn" :maxHeight="0.36"></d2-table>
+      <div class="page-farm--content-table">
+        <d2-table :tableData="tableData" :tableColumn="tableColumn"></d2-table>
       </div>
     </div>
-    <div class="main-aside">
+    <div class="page-farm--aside">
       <div v-if="!field_data.length">
         <el-button>添加地块</el-button>
       </div>
-      <div class="item-card" v-for="(item,index) in field_data" :key="index">
+      <div class="page-farm--aside-card" v-for="(item,index) in field_data" :key="index">
         <d2-card :isActive="areaIndex==index?true:false">
           <div slot="title">
             <span>{{item.area_name}}</span>
             <el-button style="float: right; padding: 6px" type="primary" @click="showArea(index)">详细</el-button>
           </div>
-          <div slot="body" class="card-body" @click="showFarming(index)">
+          <div slot="body" class="page-farm--aside-card-body" @click="showFarming(index)">
             <span>地区：{{item.area_province+item.area_city+item.area_country}}</span><br>
             <span>详细地址：{{item.area_address}}</span><br>
             <span>面积：{{item.area_large}}亩</span><br>
@@ -312,42 +312,45 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .map-container {
+  .page-farm {
     width: 100%;
     height: 100%;
-    .main-content {
+    .page-farm--content {
       float: left;
       height: 100%;
-      width: 74.8%;
-      overflow: hidden;
-      .chart-btn {
+      width: 75%;
+      .page-farm--content-btn {
         height: 30px;
-        margin: 8px 10px 0 0;
         .el-button {
           margin: 0;
           border-radius: 0;
           float: right;
         }
       }
+      .papge-farm--content-hr {
+        margin-top: 18px;
+      }
       #farm-chart {
         width: 100%;
         height: 50%;
         min-height: 300px;
       }
-      #farm-item {
-        margin-top: 20px;
+      .page-farm--content-table {
+        margin-top: 10px;
         width: 100%;
+        height: 44%;
+        overflow: auto;
       }
     }
-    .main-aside {
+    .page-farm--aside {
       border-left: 0.1vw solid rgb(202, 199, 199);
       float:right;
-      width: 25%;
+      width: 24.4%;
       height: 100%;
       overflow: auto;
-      .item-card {
+      .page-farm--aside-card {
         width: 100%;
-        .card-body {
+        .page-farm--aside-card-body {
           cursor: pointer;
         }
       }

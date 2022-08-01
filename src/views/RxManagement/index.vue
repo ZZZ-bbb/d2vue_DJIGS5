@@ -13,7 +13,8 @@
       <d2-table
         :tableData="rxData"
         :tableColumn="tableColumn"
-        :sortData="sortData">
+        :sortData="sortData"
+        :maxHeight="0.8">
       </d2-table>
     </div>
     <div class="page-rx-table-pagination">
@@ -61,10 +62,9 @@
         <el-upload
           ref="upload"
           action="fakeaction"
-          :file-list="fileList"
           :auto-upload="false"
           :limit="1"
-          :multiple="true"
+          :multiple="false"
           :http-request="uploadSectionFile"
           :on-exceed="handleExceed">
           <div slot="tip" class="page-rx-upload-tip">只能上传geojson格式文件</div>
@@ -95,7 +95,6 @@ export default {
       },
       options: [], // 选项框数据
       dialogVisible: false,
-      fileList: [],
       rxData: [], // 总数据
       currentPage: 1, // 当前页码
       total: 0, // 总条数
@@ -132,13 +131,14 @@ export default {
         },
         {
           prop: 'rx_fertilizers',
-          title: '总施肥量',
+          title: '总施肥量(KG)',
           align: 'center'
         },
         {
           prop: 'rx_name',
           title: '文件名',
-          align: 'center'
+          align: 'center',
+          showOverflowTooltip: true
         },
         {
           prop: 'created_at',
@@ -196,9 +196,9 @@ export default {
     ]),
     getData () {
       this.getRxData({ page: this.currentPage, list_num: this.pageSize }).then(res => {
-        // this.total = res.data.count
-        this.rxData = res.data.data
-        console.log(this.rxData)
+        this.total = res.data.data.count
+        this.rxData = res.data.data.data
+        console.log(res)
       })
       this.getSelectFarmData().then(res => {
         this.options = res.data.data

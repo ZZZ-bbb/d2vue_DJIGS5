@@ -45,7 +45,8 @@ export default {
         {
           prop: 'name',
           title: '文件名',
-          align: 'center'
+          align: 'center',
+          showOverflowTooltip: true
         },
         {
           prop: 'ext',
@@ -184,13 +185,10 @@ export default {
       data.append('file_name', file.name)
       data.append('file_size', file.size)
       data.append('file_args', JSON.stringify(file.data))
-      console.log(JSON.stringify(file.data))
-      console.log(typeof (JSON.stringify(file.data)))
       this.uploader.md5File(file).then(val => {
         data.append('file_etag', val)
         this.checkFile(data).then(res => {
           file.statusText = file.getStatus()
-          console.log(res)
           if (res.data.msg === '已完成') {
             this.uploader.skipFile(file)
             file.statusText = file.getStatus()
@@ -261,7 +259,7 @@ export default {
      * 响应判断
      */
     uploadAccept (obj, res) {
-      if (res.code === 200) {
+      if (res.code === 200 || res.code === 0) {
         return true
       } else {
         return false

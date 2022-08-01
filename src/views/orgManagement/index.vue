@@ -1,57 +1,50 @@
 <template>
-  <d2-container class="map-container">
-    <div class="main-content">
-      <div class="order-button">
-        <div class="button-item">
+  <d2-container class="page-org">
+    <div class="page-org--content">
+      <div class="page-org--content-button" flex>
+        <div class="page-org--content-button-item">
           <el-button type="danger" size="medium" icon="el-icon-edit" round @click="allOrders">全部订单</el-button>
         </div>
-        <div class="button-item">
+        <div class="page-org--content-button-item">
           <el-badge :value="farm_type_num[0]" v-if="farm_type_num[0]">
             <el-button type="primary" size="medium" icon="el-icon-edit" round @click="pendingOrders">待处理</el-button>
           </el-badge>
           <el-button v-if="!farm_type_num[0]" type="primary" size="medium" icon="el-icon-edit" round @click="pendingOrders">待处理</el-button>
         </div>
-        <div class="button-item">
+        <div class="page-org--content-button-item">
           <el-badge :value="farm_type_num[1]" v-if="farm_type_num[1]">
             <el-button type="primary" size="medium" icon="el-icon-edit" round @click="processOrders">进行中</el-button>
           </el-badge>
           <el-button v-if="!farm_type_num[1]" type="primary" size="medium" icon="el-icon-edit" round @click="processOrders">进行中</el-button>
         </div>
-        <div class="button-item">
+        <div class="page-org--content-button-item">
           <el-button type="primary" size="medium" icon="el-icon-edit" round @click="doneOrders">已完成</el-button>
         </div>
-        <div class="button-item">
+        <div class="page-org--content-button-item">
           <el-button type="primary" size="medium" icon="el-icon-edit" round @click="cancelOrders">已取消</el-button>
         </div>
       </div>
-      <div>
-        <d2-table :tableData="farm_data" :tableColumn="tableColumn" :sortData="sortData" :maxHeight="0.8"></d2-table>
-        <el-drawer
-          :withHeader="false"
-          :visible.sync="drawer"
-          direction="ttb"
-          size= "70%"
-          @opened="getMap"
-          :destroyOnClose="true"
-        >
-          <div id="map"></div>
-          <div class="map-aside">
-            <div class="description-item">
-              <el-descriptions title="地块信息" :column="1" border>
-              <el-descriptions-item label="地块名称">{{ name }}</el-descriptions-item> -->
-              <el-descriptions-item label="地区">{{ location }}</el-descriptions-item>
-              <el-descriptions-item label="详细地址">{{ address }}</el-descriptions-item>
-              <el-descriptions-item label="面积">{{ area }}</el-descriptions-item>
-            </el-descriptions>
-            </div>
-            <div class="description-item">
-              <el-descriptions title="作业记录" border></el-descriptions>
-            </div>
-          </div>
-        </el-drawer>
+      <div class="page-org--content-msg">
+        <d2-icon name="exclamation-circle"/>
+        <span>{{`共有 ${total} 条记录，当前显示第 ${Math.min((currentPage-1)*pageSize+1, total)} 至第 ${Math.min(currentPage*pageSize, total)} 条记录`}}</span>
+      </div>
+      <div class="page-org--content-table">
+        <d2-table :tableData="farm_data" :tableColumn="tableColumn" :sortData="sortData"></d2-table>
+        <div class="page-org--content-table-pagination">
+          <el-pagination
+            background
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :page-sizes="[1,5,10,20]"
+            @current-change="pageChange"
+            @size-change="handleSizeChange">
+          </el-pagination>
+        </div>
       </div>
     </div>
-    <div class="main-aside">
+    <div class="page-org--aside">
       <d2-card>
         <div slot="title">
             <span>作业队信息</span>
@@ -61,27 +54,136 @@
           </div>
       </d2-card>
     </div>
+    <el-drawer
+      :withHeader="false"
+      :visible.sync="drawer"
+      direction="ttb"
+      size= "70%"
+      @opened="getMap"
+      :destroyOnClose="true"
+    >
+      <div id="map"></div>
+      <div class="map-aside">
+        <div class="map-aside-item">
+          <el-descriptions title="地块信息" :column="1" border>
+          <el-descriptions-item label="地块名称">{{ name }}</el-descriptions-item>
+          <el-descriptions-item label="地区">{{ location }}</el-descriptions-item>
+          <el-descriptions-item label="详细地址">{{ address }}</el-descriptions-item>
+          <el-descriptions-item label="面积">{{ area }}</el-descriptions-item>
+        </el-descriptions>
+        </div>
+        <div class="map-aside-item">
+          <el-descriptions title="作业记录" border></el-descriptions>
+          <span>添加时间线？</span>
+        </div>
+      </div>
+    </el-drawer>
+    <el-dialog
+      title="操作"
+      :visible.sync="dialogVisible"
+      width="800px"
+      top='15vh'
+      @close="dialogVisible=false">
+      <div class="page-org--dialog-header">
+        <el-steps
+          :active="active"
+          finish-status="success"
+          :align-center="true">
+          <el-step title="接受任务"></el-step>
+          <el-step title="作业数据上传"></el-step>
+          <el-step title="处方图查看"></el-step>
+          <el-step title="开始作业"></el-step>
+          <el-step title="作业结束"></el-step>
+        </el-steps>
+      </div>
+      <div class="page-org--dialog-body--step2" v-if="active==1">
+        <el-form label-position="top" label-width="auto">
+          <el-form-item label="施肥类型:">
+            <el-radio v-model="ferRadio" label="1">变量施肥</el-radio>
+            <el-radio v-model="ferRadio" label="2">定量施肥</el-radio>
+          </el-form-item>
+          <el-divider></el-divider>
+          <el-form-item label="上传可见光图(可选):">
+            <el-upload
+              ref="uploadVS"
+              action="fakeaction"
+              :auto-upload="false"
+              :limit="1"
+              :multiple="false"
+              :http-request="uploadVSFile"
+              :on-exceed="handleExceed">
+              <el-button slot="trigger">选择文件</el-button>
+              <div class="page-org--dialog-body--step2-button">
+                <el-button @click="uploadVS" type="info">上传文件</el-button>
+              </div>
+            </el-upload>
+          </el-form-item>
+          <el-divider></el-divider>
+          <el-form-item label="上传多光谱图(可选):">
+            <el-upload
+              ref="uploadMS"
+              action="fakeaction"
+              :auto-upload="false"
+              :limit="1"
+              :multiple="false"
+              :http-request="uploadMSFile"
+              :on-exceed="handleExceed">
+              <el-button slot="trigger">选择文件</el-button>
+              <div class="page-org--dialog-body--step2-button">
+                <el-button @click="uploadMS" type="info">上传文件</el-button>
+              </div>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div class="page-org--dialog-body--step3" v-if="active==2">
+        <d2-table :tableData="rx_data" :tableColumn="rxTableColumn"></d2-table>
+      </div>
+      <div class="page-org--dialog-body--step4" v-if="active==3">
+        <span>作业数据,需要同步数据</span>
+      </div>
+      <span slot="footer" flex="main:justify">
+        <el-button type="danger" @click="lastStep">驳回</el-button>
+        <el-button type="success" @click="nextStep">下一步</el-button>
+      </span>
+    </el-dialog>
   </d2-container>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { MessageBox } from 'element-ui'
+import { mapActions, mapState } from 'vuex'
 import util from '@/libs/util'
 export default {
   name: 'org-management',
   inject: ['reload'],
   data () {
     return {
+      ferRadio: '1',
+      active: 1,
+      dialogVisible: false,
+      currentPage: 1, // 当前页码
+      total: 0, // 总条数
+      pageSize: 10, // 每页的数据条数
       farm_type_num: [],
       drawer: false, // 抽屉控制符
       ind: 0, // 选择的table数据索引
       farm_data: [], // 农事信息
+      rx_data: [], // 处方数据
       sortData: { prop: 'farming_time', order: 'ascending' }, // 默认排序的字段
       name: '', // el-descriptions使用数组获取数据时报错，使用变量获取正常，原因未知，故申明以下变量
       location: '',
       address: '',
       area: '',
       tableColumn: [ // 列表字段数据
+        {
+          prop: '',
+          title: '序号',
+          align: 'center',
+          formatter: (row, column, cellValue, index) => {
+            return index + 1 + (this.currentPage - 1) * this.pageSize
+          }
+        },
         {
           prop: 'user_name',
           title: '发布用户',
@@ -120,21 +222,85 @@ export default {
           title: '操作',
           align: 'center',
           formatter: (row, column, cellValue, index) => {
+            if (row.farm_work_type === 'pending') {
+              return (
+                <div flex="main:center">
+                  <el-button
+                    style="padding: 6px"
+                    type="primary"
+                    onClick={this.handleDrawer.bind(this, index)}
+                  >
+                    详细
+                  </el-button>
+                  <el-button
+                    style= "padding: 6px"
+                    type="primary"
+                    onClick={this.handleAccess.bind(this, row.farm_work_id)}
+                  >
+                    接受
+                  </el-button>
+                </div>
+              )
+            } else if (row.farm_work_type === 'process') {
+              return (
+                <div flex="main:center">
+                  <el-button
+                    style="padding: 6px"
+                    type="primary"
+                    onClick={this.handleDrawer.bind(this, index)}
+                  >
+                    详细
+                  </el-button>
+                  <el-button
+                    style= "padding: 6px"
+                    type="primary"
+                    onClick={this.handleDialog.bind(this, row.farm_work_id)}
+                  >
+                    操作
+                  </el-button>
+                </div>
+              )
+            }
+          }
+        }
+      ],
+      rxTableColumn: [
+        {
+          prop: 'rx_name',
+          title: '文件名',
+          align: 'center',
+          showOverflowTooltip: true
+        },
+        {
+          prop: 'rx_area',
+          title: '施肥面积(亩)',
+          align: 'center'
+        },
+        {
+          prop: 'rx_fertilizers',
+          title: '施肥量(KG)',
+          align: 'center'
+        },
+        {
+          prop: '',
+          title: '操作',
+          align: 'center',
+          formatter: (row, column, cellValue, index) => {
             return (
               <div flex="main:center">
                 <el-button
                   style="padding: 6px"
                   type="primary"
-                  onClick={this.handleDrawer.bind(this, index)}
+                  // onClick={this.handleDrawer.bind(this, index)}
                 >
-                  详细
+                  查看
                 </el-button>
                 <el-button
                   style= "padding: 6px"
                   type="primary"
-                  onClick={this.handleAccess.bind(this, row.farm_work_id)}
+                  // onClick={this.handleAccess.bind(this, row.farm_work_id)}
                 >
-                  接受
+                  下载
                 </el-button>
               </div>
             )
@@ -158,23 +324,40 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     this.getFarmWorkNum()
     this.getFarmWork()
+    this.getRx()
+  },
+  computed: {
+    ...mapState('d2admin/organization', [
+      'type'
+    ])
   },
   methods: {
+    ...mapActions('d2admin/prescription', [
+      'getRxData'
+    ]),
     ...mapActions('d2admin/organization', [
-      'getWorkDataNum', 'getWorkData', 'accessWork'
+      'getWorkDataNum', 'getWorkData', 'accessWork', 'setTypeData'
+    ]),
+    ...mapActions('d2admin/uploader', [
+      'pushTmp'
     ]),
     getFarmWork () {
-      this.getWorkData({ type: 'all' }).then(res => {
-        this.farm_data = res.data.data
-        console.log(this.farm_data)
+      this.getWorkData({ type: this.type, page: this.currentPage, list_num: this.pageSize }).then(res => {
+        this.total = res.data.data.count
+        this.farm_data = res.data.data.data
       })
     },
     getFarmWorkNum () {
       this.getWorkDataNum().then(res => {
         this.farm_type_num = res.data.data
+      })
+    },
+    getRx () {
+      this.getRxData({ page: this.currentPage, list_num: this.pageSize }).then(res => {
+        this.rx_data = res.data.data.data
       })
     },
     getMap () {
@@ -199,55 +382,135 @@ export default {
       this.area = this.farm_data[this.ind].plant_area_info[0].area_large + '亩'
     },
     allOrders () {
-      this.getWorkData({ type: 'all' }).then(res => {
-        this.farm_data = res.data.data
-      })
+      this.setTypeData('all')
+      this.getFarmWork()
     },
     processOrders () {
-      this.getWorkData({ type: 'process' }).then(res => {
-        this.farm_data = res.data.data
-      })
+      this.setTypeData('process')
+      this.getFarmWork()
     },
     doneOrders () {
-      this.getWorkData({ type: 'done' }).then(res => {
-        this.farm_data = res.data.data
-      })
+      this.setTypeData('done')
+      this.getFarmWork()
     },
     pendingOrders () {
-      this.getWorkData({ type: 'pending' }).then(res => {
-        this.farm_data = res.data.data
-      })
+      this.setTypeData('pending')
+      this.getFarmWork()
     },
     cancelOrders () {
-      this.getWorkData({ type: 'cancel' }).then(res => {
-        this.farm_data = res.data.data
-      })
+      this.setTypeData('cancel')
+      this.getFarmWork()
+    },
+    pageChange (val) {
+      this.currentPage = val
+      this.getFarmWork()
+    },
+    handleSizeChange (val) {
+      this.currentPage = 1
+      this.pageSize = val
+      this.getFarmWork()
+    },
+    handleDialog () {
+      this.dialogVisible = true
+    },
+    uploadVSFile (params) {
+      const file = params.file
+      const fileType = file.type
+      if (fileType !== 'image/tiff') {
+        this.$refs.upload.clearFiles()
+        return this.$message.error('请上传tif格式文件')
+      }
+      this.pushTmp({ file, type: 'vs' })
+    },
+    uploadMSFile (params) {
+      const file = params.file
+      const fileType = file.type
+      if (fileType !== 'image/tiff') {
+        this.$refs.upload.clearFiles()
+        return this.$message.error('请上传tif格式文件')
+      }
+      this.pushTmp({ file, type: 'ms' })
+    },
+    uploadVS () {
+      this.$refs.uploadVS.submit()
+    },
+    uploadMS () {
+      this.$refs.uploadMS.submit()
+    },
+    handleExceed (files, fileList) {
+      this.$message.warning('当前限制选择 1 个文件')
+    },
+    lastStep () {
+      if (this.active > 0) {
+        this.active--
+      }
+    },
+    nextStep () {
+      if (this.active === 1) {
+        MessageBox.confirm('确定要提交该数据吗', '提交步骤', { type: 'warning' })
+          .then(() => {
+            // this.uploadVS()
+            // this.uploadMS()
+            this.active++
+          })
+          .catch(() => {
+            this.$message.info('取消操作')
+          })
+      } else if (this.active === 3) {
+        this.active = 5
+      } else if (this.active > 4) {
+        this.active = 0
+      } else {
+        this.active++
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  .map-container {
+  .page-org {
     width: 100%;
     height: 100%;
-    .main-content {
+    .page-org--content {
       float: left;
       height: 100%;
-      width: 74.8%;
-      .order-button {
-        .button-item  {
-          float: left;
-          margin: 20px 10px;
+      width: 75%;
+      .page-org--content-button {
+        margin-bottom: 1%;
+        .page-org--content-button-item  {
+          margin: 10px 10px;
+        }
+      }
+      .page-org--content-table {
+        height: 90%;
+        overflow: auto;
+        .page-org--content-table-pagination {
+          margin-bottom: 10px;
         }
       }
     }
-    .main-aside {
+    .page-org--aside {
       border-left: 0.1vw solid rgb(202, 199, 199);
       float:right;
-      width: 25%;
+      width: 24.4%;
       height: 100%;
-      // overflow: auto;
+      overflow: auto;
+    }
+    .page-org--dialog-body--step2 {
+      border-radius: 4px;
+      border: 2px solid #DCDFE6;
+      padding: 0 20px;
+      margin-top: 40px;
+      .page-org--dialog-body--step2-button {
+        float: right;
+      }
+    }
+    .page-org--dialog-body--step3 {
+      margin-top: 40px;
+    }
+    .page-org--dialog-body--step4 {
+      margin-top: 40px;
     }
     #map {
       width: 75%;
@@ -257,7 +520,7 @@ export default {
     .map-aside {
       width: 25%;
       float:right;
-      .description-item {
+      .map-aside-item {
         margin: 10% 4% 10% 4%;
       }
     }

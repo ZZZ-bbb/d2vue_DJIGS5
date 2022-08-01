@@ -6,7 +6,6 @@
         :data="tableData"
         :default-sort="sortData"
         :height="tableHeight"
-        :max-height="getMaxHeight"
         :header-cell-style="{ 'text-align': 'center', 'background-color': '#eee', color: '#333333' }"
         v-loading="isLoading"
         @selection-change="selectionChange"
@@ -50,10 +49,6 @@ export default {
       type: Number,
       default: null
     },
-    maxHeight: {
-      type: Number,
-      default: 0.5
-    },
     isLoading: {
       type: Boolean,
       default: false
@@ -65,12 +60,6 @@ export default {
     tableRef: {
       type: String,
       default: null
-    }
-  },
-  computed: {
-    getMaxHeight () {
-      // 请传入0-1的比例值
-      return window.innerHeight * this.maxHeight
     }
   },
   methods: {

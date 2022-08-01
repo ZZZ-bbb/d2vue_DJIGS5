@@ -16,10 +16,11 @@ export default {
     /**
      * @description 获取处方信息
      * @param {Object} context context
+     * @param {Object} data data
      * @returns res
      */
-    async getRxData (context) {
-      const res = await api.SYS_RX_GET()
+    async getRxData (context, data) {
+      const res = await api.SYS_RX_GET(data)
       return res
     },
     /**

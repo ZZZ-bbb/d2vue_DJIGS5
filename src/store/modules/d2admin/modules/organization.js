@@ -3,6 +3,14 @@ import { Message, MessageBox } from 'element-ui'
 
 export default {
   namespaced: true,
+  state: {
+    type: 'all'
+  },
+  mutations: {
+    setType (state, type) {
+      state.type = type
+    }
+  },
   actions: {
     /**
      * @description 获取所有用户农事信息
@@ -43,6 +51,9 @@ export default {
           commit('d2admin/gray/set', false, { root: true })
           Message({ message: '取消接受操作' })
         })
+    },
+    setTypeData ({ commit }, data) {
+      commit('setType', data)
     }
   }
 }
