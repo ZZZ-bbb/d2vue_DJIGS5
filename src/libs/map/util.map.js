@@ -59,7 +59,7 @@ const newMap = (domId, option) => {
   })
   map.on('mouseup', e => {
     var HDmap = document.getElementsByName("HDmap")
-    // console.log(HDmap[0].checked);
+    console.log(HDmap[0].checked);
     if (HDmap[0].checked) {
       var zoom = map.getZoom();
       if (zoom < 12) {
@@ -92,6 +92,7 @@ const newMap = (domId, option) => {
           params: params
         }).then((res) => {
           if (res.data.size == 0 ||  _.isEqual(res.data.data, layername)){
+            console.log(1);
             return
           }
           layerGroups.clearLayers();
@@ -118,8 +119,12 @@ const newMap = (domId, option) => {
         // console.log("SouthWest:" + SouthWest);
         // console.log("leftdown:" + leftdown);
       }
+    }else{
+      layerGroups.clearLayers()
+      layername = ""
     }
   })
+  
   addMapChoosen(map)
   return map
 }
