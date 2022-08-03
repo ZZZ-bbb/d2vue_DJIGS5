@@ -79,6 +79,7 @@
       </div>
     </el-drawer>
     <el-dialog
+      :close-on-click-modal="false"
       title="操作"
       :visible.sync="dialogVisible"
       width="800px"
@@ -86,7 +87,7 @@
       @close="dialogVisible=false">
       <div class="page-org--dialog-header">
         <el-steps
-          :active="active"
+          :active="accepted_step"
           finish-status="success"
           :align-center="true">
           <el-step title="接受任务"></el-step>
@@ -96,7 +97,7 @@
           <el-step title="作业结束"></el-step>
         </el-steps>
       </div>
-      <div class="page-org--dialog-body--step2" v-if="active==1">
+      <div class="page-org--dialog-body--step2" v-if="accepted_step==1">
         <el-form label-position="top" label-width="auto">
           <el-form-item label="施肥类型:">
             <el-radio v-model="ferRadio" label="1">变量施肥</el-radio>
@@ -136,10 +137,10 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="page-org--dialog-body--step3" v-if="active==2">
+      <div class="page-org--dialog-body--step3" v-if="accepted_step==2">
         <d2-table :tableData="rx_data" :tableColumn="rxTableColumn"></d2-table>
       </div>
-      <div class="page-org--dialog-body--step4" v-if="active==3">
+      <div class="page-org--dialog-body--step4" v-if="accepted_step==3">
         <span>作业数据,需要同步数据</span>
       </div>
       <span slot="footer" flex="main:justify">
@@ -160,7 +161,7 @@ export default {
   data () {
     return {
       ferRadio: '1',
-      active: 1,
+      accepted_step: 0,
       dialogVisible: false,
       currentPage: 1, // 当前页码
       total: 0, // 总条数
@@ -254,7 +255,7 @@ export default {
                   <el-button
                     style= "padding: 6px"
                     type="primary"
-                    onClick={this.handleDialog.bind(this, row.farm_work_id)}
+                    onClick={this.handleDialog.bind(this, row)}
                   >
                     操作
                   </el-button>
@@ -410,7 +411,8 @@ export default {
       this.pageSize = val
       this.getFarmWork()
     },
-    handleDialog () {
+    handleDialog (row) {
+      this.accepted_step = row.accepted_step
       this.dialogVisible = true
     },
     uploadVSFile (params) {
@@ -441,27 +443,27 @@ export default {
       this.$message.warning('当前限制选择 1 个文件')
     },
     lastStep () {
-      if (this.active > 0) {
-        this.active--
+      if (this.accepted_step > 0) {
+        this.accepted_step--
       }
     },
     nextStep () {
-      if (this.active === 1) {
+      if (this.accepted_step === 1) {
         MessageBox.confirm('确定要提交该数据吗', '提交步骤', { type: 'warning' })
           .then(() => {
             // this.uploadVS()
             // this.uploadMS()
-            this.active++
+            this.accepted_step++
           })
           .catch(() => {
             this.$message.info('取消操作')
           })
-      } else if (this.active === 3) {
-        this.active = 5
-      } else if (this.active > 4) {
-        this.active = 0
+      } else if (this.accepted_step === 3) {
+        this.accepted_step = 5
+      } else if (this.accepted_step > 4) {
+        this.accepted_step = 0
       } else {
-        this.active++
+        this.accepted_step++
       }
     }
   }

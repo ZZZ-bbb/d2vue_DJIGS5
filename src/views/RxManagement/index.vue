@@ -6,7 +6,7 @@
           <d2-icon name="exclamation-circle"/>
           <span>{{`共有 ${total} 条记录，当前显示第 ${Math.min((currentPage-1)*pageSize+1, total)} 至第 ${Math.min(currentPage*pageSize, total)} 条记录`}}</span>
         </div>
-        <el-button @click="dialogVisible = true">上传处方</el-button>
+        <el-button @click="dialogVisible = true">手动上传</el-button>
       </div>
     </template>
     <div class="page-rx-table">
@@ -82,7 +82,8 @@
 <script>
 import { mapActions } from 'vuex'
 export default {
-  name: 'route-list',
+  name: 'rx-management',
+  inject: ['reload'],
   data () {
     return {
       formData: {
@@ -108,11 +109,6 @@ export default {
           formatter: (row, column, cellValue, index) => {
             return index + 1 + (this.currentPage - 1) * this.pageSize
           }
-        },
-        {
-          prop: 'rx_id',
-          title: 'ID',
-          align: 'center'
         },
         {
           prop: 'user_name',
@@ -165,7 +161,7 @@ export default {
                   plain
                   style= 'padding: 6px'
                   type='primary'
-                  // onClick={ this.downloadData.bind(this, row) }
+                  onClick={ this.downloadData.bind(this, row) }
                 >
                   下载
                 </el-button>
@@ -173,7 +169,7 @@ export default {
                   plain
                   style= 'padding: 6px'
                   type='danger'
-                  // onClick={ this.deleteData.bind(this, row) }
+                  onClick={ this.deleteData.bind(this, row) }
                 >
                   删除
                 </el-button>
@@ -189,7 +185,7 @@ export default {
   },
   methods: {
     ...mapActions('d2admin/prescription', [
-      'getSelectFarmData', 'getRxData'
+      'getSelectFarmData', 'getRxData', 'delRxData', 'downloadRxData'
     ]),
     ...mapActions('d2admin/uploader', [
       'pushTmp'
@@ -207,14 +203,15 @@ export default {
     showData (index) {
       console.log(index)
     },
-    // downloadData (row) {
-    //   const Route_id = row.Route_id
-    //   this.downloadRouteData(Route_id)
-    // },
-    // deleteData (row) {
-    //   const Route_id = row.Route_id
-    //   this.deleteRouteData({ Route_id })
-    // },
+    downloadData (row) {
+      const rx_id = row.rx_id
+      this.downloadRxData(rx_id)
+    },
+    deleteData (row) {
+      const rx_id = row.rx_id
+      this.delRxData({ rx_id })
+      this.reload()
+    },
     uploadData () {
       this.$refs.formData.validate((valid) => {
         if (valid) {

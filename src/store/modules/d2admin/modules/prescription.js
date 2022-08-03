@@ -24,18 +24,18 @@ export default {
       return res
     },
     /**
-     * @description 删除地块信息
+     * @description 删除处方信息
      * @param {Object} commit commit
-     * @param {Object} data area_id {String} 地块id
+     * @param {Object} data rx_id {String} 处方id
      * @returns res
      */
-    async delFieldData ({ commit }, data) {
+    async delRxData ({ commit }, data) {
       async function deleteData (data) {
-        const res = await api.SYS_FIELD_DEL(data)
+        const res = await api.SYS_RX_DEL(data)
         Message({ message: res.data.msg, type: 'success' })
       }
       commit('d2admin/gray/set', true, { root: true })
-      await MessageBox.confirm('确定要删除该记录吗', '删除记录', { type: 'warning' })
+      await MessageBox.confirm('确定要删除该文件吗', '删除文件', { type: 'warning' })
         .then(() => {
           commit('d2admin/gray/set', false, { root: true })
           deleteData(data)
@@ -45,8 +45,14 @@ export default {
           Message({ message: '取消删除操作' })
         })
     },
-    setIndex ({ commit }, index) {
-      commit('changeAreaIndex', index)
+    /**
+     * @description 下载处方图文件
+     * @param {Object} context context
+     * @param {String} rx_id rx_id
+     */
+    async downloadRxData (context, rx_id) {
+      const url = process.env.VUE_APP_PROXY + process.env.VUE_APP_API + 'rxManagement/downloadRx?rx_id=' + rx_id
+      window.open(url)
     }
   }
 }
