@@ -111,7 +111,7 @@ export default {
           }
         },
         {
-          prop: 'user_name',
+          prop: 'UserID',
           title: '上传用户',
           align: 'center'
         },
@@ -209,8 +209,9 @@ export default {
     },
     deleteData (row) {
       const rx_id = row.rx_id
-      this.delRxData({ rx_id })
-      this.reload()
+      this.delRxData({ rx_id }).then(() => {
+        this.reload()
+      })
     },
     uploadData () {
       this.$refs.formData.validate((valid) => {

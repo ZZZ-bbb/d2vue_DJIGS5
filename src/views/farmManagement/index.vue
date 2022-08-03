@@ -95,7 +95,6 @@ export default {
       dialogVisible: false,
       farm_data: {
         area_id: '',
-        user_name: '',
         area_name: '',
         farming_type: '',
         date1: '',
@@ -199,7 +198,6 @@ export default {
         if (res.data.data.length) {
           this.field_data = res.data.data
           this.farm_data.area_id = this.field_data[this.areaIndex].area_id
-          this.farm_data.user_name = this.field_data[this.areaIndex].user_name
           this.farm_data.area_name = this.field_data[this.areaIndex].area_name
           this.getFarmWork(this.field_data[this.areaIndex].area_id)
         } else {
@@ -218,7 +216,6 @@ export default {
     showFarming (index) {
       this.setIndex(index)
       this.farm_data.area_id = this.field_data[index].area_id
-      this.farm_data.user_name = this.field_data[index].user_name
       this.farm_data.area_name = this.field_data[index].area_name
       this.getFarmWork(this.field_data[index].area_id)
     },
