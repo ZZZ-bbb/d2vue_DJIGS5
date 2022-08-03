@@ -362,7 +362,7 @@ export default {
       })
     },
     getMap () {
-      this.map = util.map.newMap('map', this.mapOption)
+      this.map = util.map.newMap_hsm('map', this.mapOption)
       util.map.createLayer(this.map, this.url, this.layerOption)
       util.map.newPolygon.showArea(this.map, JSON.parse(this.farm_data[this.ind].plant_area_info[0].area_data), JSON.parse(this.farm_data[this.ind].plant_area_info[0].area_large) + '亩')
     },

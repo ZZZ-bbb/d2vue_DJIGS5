@@ -109,7 +109,7 @@ export default {
       'setFieldData'
     ]),
     getMap () {
-      this.map = util.map.newMap('add-field-map', this.mapOption)
+      this.map = util.map.newMap_hsm('add-field-map', this.mapOption)
       util.map.createLayer(this.map, this.url, this.layerOption)
     },
     addLayer () {

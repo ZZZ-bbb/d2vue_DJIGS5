@@ -69,7 +69,7 @@ export default {
       'getFieldData', 'getFarmData', 'delFieldData', 'setIndex'
     ]),
     getMap () {
-      this.map = util.map.newMap('view-field-map', this.mapOption)
+      this.map = util.map.newMap_hsm('view-field-map', this.mapOption)
       util.map.createLayer(this.map, this.url, this.layerOption)
     },
     getArea () {

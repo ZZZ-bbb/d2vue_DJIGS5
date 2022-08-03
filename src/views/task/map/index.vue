@@ -3,21 +3,20 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
 export default {
-  data() {
+  data () {
     return {
       info: {
-        task_id: "",
-        UserID: "",
-        filename: "",
-        created_at: "",
+        task_id: '',
+        UserID: '',
+        filename: '',
+        created_at: ''
       },
-      chart1Data: "",
-      linedata: "",
-      map: "",
+      chart1Data: '',
+      linedata: '',
+      map: '',
       url:
-        "https://api.mapbox.com/styles/v1/764371741/cl104r88t006415od03t8itpo/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiNzY0MzcxNzQxIiwiYSI6ImNsMHZ3Y2V5bjBuZWQzY210ZDBuOWh1ejIifQ.ZrfiUT3M-7HVGdWdWb1pCQ",
+        'https://api.mapbox.com/styles/v1/764371741/cl104r88t006415od03t8itpo/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiNzY0MzcxNzQxIiwiYSI6ImNsMHZ3Y2V5bjBuZWQzY210ZDBuOWh1ejIifQ.ZrfiUT3M-7HVGdWdWb1pCQ',
       layerOption: {
         zoomOffset: -1,
         tileSize: 512,
@@ -33,31 +32,31 @@ export default {
         zoom: 22,
         zoomControl: false,
         attributionControl: false,
-        crs: L.CRS.EPSG3857,
-      },
-    };
+        crs: L.CRS.EPSG3857
+      }
+    }
   },
-  mounted() {
-    this.getMap();
+  mounted () {
+    this.getMap()
   },
   computed: {
-    // ...mapState("d2admin/task", ["chart1Data"]),
+    // ...mapState('d2admin/task', ['chart1Data']),
   },
   methods: {
-    getMap() {
-      this.info.task_id = this.$route.query.task_id;
-      this.info.UserID = this.$route.query.UserID;
-      this.info.filename = this.$route.query.filename;
-      this.info.created_at = this.$route.query.created_at;
-      this.chart1Data = this.$route.query.chart1Data;
-      this.map = this.$map.newMap("map", this.mapOption);
-      this.$map.addInfo(this.map, this.info);
-      // this.$map.addMapChoosen(this.map);
-      this.$map.createLayer(this.map, this.url, this.layerOption);
-      this.$map.showLine(this.chart1Data, { color: "red" }, this.map);
-    },
-  },
-};
+    getMap () {
+      this.info.task_id = this.$route.query.task_id
+      this.info.UserID = this.$route.query.UserID
+      this.info.filename = this.$route.query.filename
+      this.info.created_at = this.$route.query.created_at
+      this.chart1Data = this.$route.query.chart1Data
+      this.map = this.$map.newMap('map', this.mapOption)
+      this.$map.addRouteInfo(this.map, this.info)
+      // this.$map.addMapChoosen(this.map)
+      this.$map.createLayer(this.map, this.url, this.layerOption)
+      this.$map.showLine(this.chart1Data, { color: 'red' }, this.map)
+    }
+  }
+}
 </script>
 
 <style>
