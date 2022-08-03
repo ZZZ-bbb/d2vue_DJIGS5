@@ -1,22 +1,23 @@
 export default ({ service, request, serviceForMock, requestForMock, mock, faker, tools }) => ({
   /**
-   * @description 本地LDAP登录
+   * @description 登录
    * @param {object} data 登录携带的信息
    */
   SYS_USER_LOGIN (data = {}) {
     return request({
-      url: 'account/ldap_login',
+      url: 'account/login_check',
       method: 'post',
       data
     })
   },
   /**
-   * @description 登出清空服务器记录
+   * @description 获取验证码
    */
-  SYS_USER_LOGOUT () {
+  SYS_USER_CODE () {
     return request({
-      url: 'account/logout',
-      method: 'get'
+      url: 'account/get_code',
+      method: 'get',
+      responseType: 'blob'
     })
   }
 })

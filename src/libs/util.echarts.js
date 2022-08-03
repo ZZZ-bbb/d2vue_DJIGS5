@@ -210,9 +210,26 @@ const myChart = (id, data) => {
   return chart
 }
 
+
+/**
+ * @description 初始化
+ * @param {String} id 实例容器id
+ * @param {object} data 配置项，万能接口
+ */
+function init (id, data = {}) {
+  chart = echarts.init(document.getElementById(id))
+  chart.setOption(data)
+
+  // 图标自适应监听
+  window.addEventListener('resize', function () {
+    chart.resize()
+  })
+  return chart
+}
+
 const refChart = (data) => {
   chart.clear()
   chart.setOption(option(data))
 }
 
-export default { myChart, getVirtulDate, refChart }
+export default { myChart, getVirtulDate, refChart, init }

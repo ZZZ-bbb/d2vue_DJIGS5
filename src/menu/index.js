@@ -53,6 +53,27 @@ export const menuHeader = supplementPath([
     children: [
       { path: '/', title: '农资管理' }
     ]
+  },
+  {
+    title: '作业路径',
+    icon: 'folder-o',
+    children: [
+      { path: '/route-list', title: '路径列表' }
+    ]
+  },
+  {
+    title: '软件管理',
+    icon: 'folder-o',
+    children: [
+      { path: 'editon-info', title: '版本信息' }
+    ]
+  },
+  {
+    title: '作业数据',
+    icon: 'folder-o',
+    children: [
+      { path: 'task-list', title: '数据列表' }
+    ]
   }
 ])
 
@@ -92,6 +113,27 @@ export const menuAside = supplementPath([
     icon: 'folder-o',
     children: [
       { path: '/', title: '农资管理' }
+    ]
+  },
+  {
+    title: '作业路径',
+    icon: 'folder-o',
+    children: [
+      { path: '/route-list', title: '路径列表' }
+    ]
+  },
+  {
+    title: '软件管理',
+    icon: 'folder-o',
+    children: [
+      { path: 'editon-info', title: '版本信息' }
+    ]
+  },
+  {
+    title: '作业数据',
+    icon: 'folder-o',
+    children: [
+      { path: 'task-list', title: '数据列表' }
     ]
   }
 ])

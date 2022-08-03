@@ -44,6 +44,16 @@
                     <i slot="prepend" class="fa fa-keyboard-o"></i>
                   </el-input>
                 </el-form-item>
+                <el-form-item prop="check_code">
+                  <el-input
+                    type="text"
+                    v-model="formLogin.check_code"
+                    placeholder="验证码">
+                    <template slot="append">
+                      <img class="login-code" :src="imgSrc" @click="getCode">
+                    </template>
+                  </el-input>
+                </el-form-item>
                 <el-button
                   size="default"
                   @click="submit"
@@ -98,8 +108,9 @@ export default {
       imgSrc: '',
       // 表单
       formLogin: {
-        username: '123456',
-        password: '123456'
+        username: '18520433015',
+        password: '2121500',
+        check_code: 'aaaaaaa'
       },
       // 表单校验
       rules: {
@@ -116,11 +127,19 @@ export default {
             message: '请输入密码',
             trigger: 'blur'
           }
+        ],
+        check_code: [
+          {
+            required: true,
+            message: '请输入验证码',
+            trigger: 'blur'
+          }
         ]
       }
     }
   },
   mounted () {
+    this.getCode()
     // setInterval()与clearInterval()结合，实现在当前窗口摧毁时，没1000毫秒调用一次refreshTime() hsm
     this.timeInterval = setInterval(() => {
       this.refreshTime()
@@ -152,6 +171,9 @@ export default {
     submit () {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
+          // 登录
+          // 注意 这里的演示没有传验证码
+          // 具体需要传递的数据请自行修改代码
           this.login({
             username: this.formLogin.username,
             password: this.formLogin.password,
@@ -165,6 +187,15 @@ export default {
           // 登录表单校验失败
           this.$message.error('表单校验失败，请检查')
         }
+      })
+    },
+    /**
+     * @description 获取验证码
+     */
+    getCode () {
+      this.code().then(res => {
+        const url = window.URL.createObjectURL(res)
+        this.imgSrc = url
       })
     }
   }

@@ -72,6 +72,45 @@ const frameIn = [
         },
         component: _import('RxManagement')
       },
+      // 路径列表
+      {
+        path: 'route-list',
+        name: 'route-list',
+        meta: {
+          title: '路径列表',
+          auth: true
+        },
+        component: _import('route/route-list')
+      },
+      // 版本信息
+      {
+        path: 'editon-info',
+        name: 'editon-info',
+        meta: {
+          title: '版本信息',
+          auth: true
+        },
+        component: _import('edition/edition-info')
+      },
+      // 作业数据
+      {
+        path: 'task-list',
+        name: 'task-list',
+        meta: {
+          title: '数据列表',
+          auth: true
+        },
+        component: _import('task/task-list')
+      },
+      {
+        path: 'page3',
+        name: 'page3',
+        meta: {
+          title: '页面 3',
+          auth: true
+        },
+        component: _import('demo/page3')
+      },
       // 系统 前端日志
       {
         path: 'log',
@@ -109,7 +148,16 @@ const frameOut = [
     path: '/login',
     name: 'login',
     component: _import('system/login')
-  }
+  },
+  {
+    path: '/map',
+    name: 'map',
+    meta: {
+      title: '地图',
+      auth: true
+    },
+    component: _import('task/map')
+  },
 ]
 
 /**

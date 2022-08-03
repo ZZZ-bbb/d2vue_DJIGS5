@@ -1,6 +1,8 @@
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './map.css'
+import { request } from '@/api/service'
+
 
 // 定义默认图标路径
 delete L.Icon.Default.prototype._getIconUrl
@@ -10,11 +12,36 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 })
 
+var radio = "A"
 var map = '' // 地图实例
 var fieldInfo = '' // 信息控件实例
+var filedMapInfo = '' //地图信息实例
+var filedMapChoosen = "" //地图选项实例
+var tileL = ""
+var layerGroups = "" //高清地图图层
+var layername = ""
+
 
 /**
  * @description 创建地图实例
+ * @param {String} domId 容器ID
+ * @param {Object} option option
+ * @returns {Object} map实例
+ */
+ const newMap_hsm = (domId, option) => {
+  if (map !== undefined && map !== null && map !== '') {
+    map.remove()
+  }
+  map = L.map(domId, option)
+  L.control.scale({
+    imperial: false
+  }).addTo(map)
+  return map
+}
+
+
+/**
+ * @description 创建地图实例，周子滨用
  * @param {String} domId 容器ID
  * @param {Object} option option
  * @returns {Object} map实例
@@ -27,7 +54,111 @@ const newMap = (domId, option) => {
   L.control.scale({
     imperial: false
   }).addTo(map)
+  layerGroups = new L.FeatureGroup({
+    zoomOffset: -1,
+    tileSize: 512,
+    maxZoom: 100,
+    minNativeZoom: 0,
+    maxNativeZoom: 100
+  }).addTo(map)
+  map.on('preclick', e => {
+    var url
+    var maplist = document.getElementsByName("map")
+    for (var i in maplist) {
+      if (maplist[i].checked) {
+        url = maplist[i].value
+        tileL.setUrl(url).addTo(map)
+      }
+    }
+  })
+  map.on("zoom", e => {
+    addMapInfo(map)
+  })
+  map.on('move', e => {
+    addMapInfo(map)
+
+  })
+  map.on('mouseup', e => {
+    var HDmap = document.getElementsByName("HDmap")
+    console.log(HDmap[0].checked);
+    if (HDmap[0].checked) {
+      var zoom = map.getZoom();
+      if (zoom < 12) {
+        console.log("放大倍数过小！");
+        console.log("放大倍数过小");
+      } else {
+        var cen = map.getCenter();
+        var size = map.getSize();
+        var SouthWest = map.getBounds();
+        var leftdown =
+          map.getBounds().getSouthWest().lng +
+          "," +
+          map.getBounds().getSouthWest().lat;
+        var vfirstside = cen.lng - map.getBounds().getSouthWest().lng;
+        var vsecendside = cen.lat - map.getBounds().getSouthWest().lat;
+        var viewR = vfirstside * vfirstside + vsecendside * vsecendside;
+        var params = {
+          viewZoom: zoom,
+          viewPointLat: cen.lat,
+          viewPointLng: cen.lng,
+          viewR: viewR,
+        };
+        // console.log("params:" + params.viewZoom);
+        // console.log("cenlat:" + params.viewPointLat);
+        // console.log("cenlng:" + params.viewPointLng);
+        // console.log("vr:" + params.viewR);
+        request({
+          url: 'http://106.55.229.44:443/api/map/get_layer',
+          method: 'get',
+          params: params
+        }).then((res) => {
+          if (res.data.size == 0 ||  _.isEqual(res.data.data, layername)){
+            console.log(1);
+            return
+          }
+          layerGroups.clearLayers();
+          for (var i in res.data.data) {
+            layername = res.data.data
+            var a = L.tileLayer
+              .wms("http://106.55.229.44:8888/geoserver/bottom_layer/wms", {
+                layers: res.data.data[i] + ".tif",
+                service: "WMS",
+                transparent: true,
+                format: "image/png",
+                crs: L.CRS.EPSG4326,
+                maxZoom: 100
+              })
+              .addTo(map);
+            layerGroups.addLayer(a);
+            // console.log(layerGroups);
+            // console.log(res.data.data[i]);
+          }
+        });
+        // console.log("center:" + cen);
+        // console.log("size:" + size);
+        // console.log("zoom:" + zoom);
+        // console.log("SouthWest:" + SouthWest);
+        // console.log("leftdown:" + leftdown);
+      }
+    }else{
+      layerGroups.clearLayers()
+      layername = ""
+    }
+  })
+  
+  addMapChoosen(map)
   return map
+}
+
+/**
+ * @description 创建path图层
+ * @param {String}  data  路径点数据
+ * @param {Object} option 路线样式
+ * @returns {Object} map实例
+ */
+const showLine = (data, option, map) => {
+  const path = L.polyline(data, option).addTo(map)
+  map.fitBounds(path.getBounds());
 }
 
 /**
@@ -38,16 +169,19 @@ const newMap = (domId, option) => {
  * @returns {Object} newLayer
  */
 const createLayer = (map, url, option) => {
-  const newLayer = L.tileLayer(url, option).addTo(map)
+  // console.log(option);
+  tileL = L.tileLayer(url, option)
+  const newLayer = tileL.addTo(map)
   return newLayer
 }
+
 
 /**
  * @description 右上角添加信息控件,内容为地块种植情况
  * @param {Object} map map实例
  * @param {Object} info info
  */
-const addInfo = (map, info) => {
+ const addFarmInfo = (map, info) => {
   // info处理
   let farming_flg = 0
   if (info.length) {
@@ -96,9 +230,135 @@ const addInfo = (map, info) => {
   }).addTo(map)
 }
 
+
+/**
+ * @description 右上角添加信息控件,内容为作业信息
+ * @param {Object} map map实例
+ * @param {Object} info info
+ */
+const addRouteInfo = (map, info) => {
+  // 自定义信息控件
+  L.Control.FieldInfo = L.Control.extend({
+    options: {
+      position: 'topright'
+    },
+    onAdd: function () { // L.Control原生方法，使用addTo()时调用该方法
+      this._container = L.DomUtil.create('div', 'info')
+      this._container.innerHTML = `
+        <h4>作业信息</h4><hr></br>
+        <h5>作业ID: ${info.task_id}</h5></br>
+        <h5>作业时间：${info.filename}</h5></br>
+        <h5>上传时间：${info.created_at}</h5></br>
+        <h5>作业时间：${info.filename}</h5></br>
+        <h5>模式：${"施肥"}</h5></br>
+        <h5>状态：${"正常"}</h5></br>
+        <h5>作业地址：${"/"}</h5></br>
+        `
+      return this._container
+    },
+    onRemove: function () { // L.Control原生方法，使用remove()时调用该方法
+      L.DomUtil.remove(this._container)
+    }
+  })
+  // 添加到L.control 控件中，注意这里是小写
+  L.control.fieldInfo = function (options) {
+    return new L.Control.FieldInfo(options)
+  }
+
+  // if (fieldInfo !== '' && fieldInfo !== undefined && fieldInfo !== null) {
+  //   fieldInfo.remove()
+  // }
+
+  fieldInfo = L.control.fieldInfo({
+    // 此处设置options，将替换掉上方原始options
+  }).addTo(map)
+}
+
+/**
+ * @description 左下角上角添加信息控件,内容为地图切换按钮
+ * @param {Object} map map实例
+ * @param {Object} info info
+ */
+const addMapChoosen = (map) => {
+  // 自定义信息控件
+  L.Control.FieldInfo = L.Control.extend({
+    options: {
+      position: 'topright'
+    },
+    onAdd: function () { // L.Control原生方法，使用addTo()时调用该方法
+      this._container = L.DomUtil.create('div', 'info')
+      this._container.innerHTML = `
+      <form class="mapClass">
+      <label class="single"><input type="radio" name="map" value="https://api.mapbox.com/styles/v1/764371741/cl104r88t006415od03t8itpo/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiNzY0MzcxNzQxIiwiYSI6ImNsMHZ3Y2V5bjBuZWQzY210ZDBuOWh1ejIifQ.ZrfiUT3M-7HVGdWdWb1pCQ" checked/>MapBox</label>
+      <label class="single"><input type="radio" name="map" value="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />leaflet地图</label>
+      <label class="single"><input type="radio" name="map" value="https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}" />高德地图</label>
+      <label class="single"><input type="radio" name="map" value="http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}" />谷歌地图</label>
+      </form>
+      <hr>
+      <h4>高清地图<input name="HDmap" type="checkbox" checked></h4>
+        `
+      return this._container
+    },
+    onRemove: function () { // L.Control原生方法，使用remove()时调用该方法
+      L.DomUtil.remove(this._container)
+    }
+  })
+  // 添加到L.control 控件中，注意这里是小写
+  L.control.fieldInfo = function (options) {
+    return new L.Control.FieldInfo(options)
+  }
+
+  // if (fieldInfo !== '' && fieldInfo !== undefined && fieldInfo !== null) {
+  //   fieldInfo.remove()
+  // }
+
+  fieldInfo = L.control.fieldInfo({
+    // 此处设置options，将替换掉上方原始options
+  }).addTo(map)
+}
+
+/**
+ * @description 左下角上角添加信息控件,内容为地图信息
+ * @param {Object} map map实例
+ * @param {Object} info info
+ */
+const addMapInfo = (map) => {
+  var center = map.getCenter()
+  var zoom = map.getZoom()
+  // 自定义信息控件
+  L.Control.FieldInfo = L.Control.extend({
+    options: {
+      position: 'bottomleft'
+    },
+    onAdd: function () { // L.Control原生方法，使用addTo()时调用该方法
+      this._container = L.DomUtil.create('div', 'info')
+      this._container.innerHTML = `
+        <h4>地图信息</h4><hr></br>
+        <h5>放大倍数: ${zoom}</h5></br>
+        <h5>中心点：${center}</h5></br>       
+        `
+      return this._container
+    },
+    onRemove: function () { // L.Control原生方法，使用remove()时调用该方法
+      L.DomUtil.remove(this._container)
+    }
+  })
+  // 添加到L.control 控件中，注意这里是小写
+  L.control.FieldInfo = function (options) {
+    return new L.Control.FieldInfo(options)
+  }
+
+  if (filedMapInfo !== '' && filedMapInfo !== undefined && filedMapInfo !== null) {
+    filedMapInfo.remove()
+  }
+
+  filedMapInfo = L.control.fieldInfo({
+    // 此处设置options，将替换掉上方原始options
+  }).addTo(map)
+}
+
 // 鼠标坐标位置信息
 // fixme
-
 // 添加Popup
 // fixme
 
@@ -122,9 +382,9 @@ var CM = L.layerGroup() // 移动点图层组
 const newPolygon = {
   /**
    * @description 鼠标点击事件，记录点以及绘制辅助线
-   * @param {Object} e 坐标信息
+   * @param { Object } e 坐标信息
    */
-  onClick (e) {
+  onClick(e) {
     points.push([e.latlng.lat, e.latlng.lng])
     lines.addLatLng(e.latlng)
     map.addLayer(tempLines)
@@ -132,9 +392,9 @@ const newPolygon = {
   },
   /**
    * @description 鼠标移动事件，绘制辅助线
-   * @param {Object} e 坐标信息
+   * @param { Object } e 坐标信息
    */
-  onMove (e) {
+  onMove(e) {
     if (points.length > 0) {
       // 最新点、当前点、原点
       const ls = [points[points.length - 1], [e.latlng.lat, e.latlng.lng], points[0]]
@@ -144,21 +404,21 @@ const newPolygon = {
   /**
    * @description 鼠标右键，结束多边形绘制，同时解除鼠标事件
    */
-  onContextmenu () {
+  onContextmenu() {
     geometry.push(L.polygon(points).addTo(map))
     lines.remove()
     tempLines.remove()
     lines = L.polyline([])
     tempLines = L.polyline([], { dashArray: 5 })
-    map.off('click')
-    map.off('contextmenu')
-    map.off('mousemove')
+    map.off('click', this.onClick)
+    map.off('contextmenu', this.onContextmenu)
+    map.off('mousemove', this.onMove)
   },
   /**
    * @description 开始多边形绘制
-   * @param {Object} mapData map实例
+   * @param { Object } mapData map实例
    */
-  start (mapData) {
+  start(mapData) {
     points = []
     map = mapData
     map.on('click', this.onClick)
@@ -169,8 +429,8 @@ const newPolygon = {
    * @description 结束多边形绘制
    * @returns { String } 多边形各点坐标数据
    */
-  end () {
-    // CM.off('move', this.movePoint)
+  end() {
+    CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
     CM = L.layerGroup()
@@ -180,7 +440,7 @@ const newPolygon = {
    * @description 移动点索引获取
    * @param { Object } e 坐标信息
    */
-  movePoint (e) {
+  movePoint(e) {
     const oldPoint = [e.oldLatLng.lat, e.oldLatLng.lng]
     if (ind === -1) {
       for (let i = 0; i < points.length; i++) {
@@ -209,7 +469,7 @@ const newPolygon = {
   /**
    * @description 更新移动后的图形
    */
-  updataPolygon () {
+  updataPolygon() {
     tempLines.remove()
     tempLines = L.polyline([], { dashArray: 5 })
     ind = -1
@@ -218,7 +478,7 @@ const newPolygon = {
   /**
    * @description 多边形编辑
    */
-  edit () {
+  edit() {
     if (points.length > 1) {
       for (const point of points) {
         CM.addLayer(
@@ -234,16 +494,16 @@ const newPolygon = {
   },
   /**
    * @description 获取多边形地理位置坐标
-   * @returns {Array} 初始点坐标
+   * @returns { Array } 初始点坐标
    */
-  getCenter () {
+  getCenter() {
     return points[0]
   },
   /**
    * @description 重新绘制多边形
    */
-  reset () {
-    // CM.off('move', this.movePoint)
+  reset() {
+    CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
     CM = L.layerGroup()
@@ -253,12 +513,12 @@ const newPolygon = {
   },
   /**
    * @description 显示多边形及相关信息
-   * @param {Object} mapData map实例
-   * @param {Array} points 多边形各点数据
-   * @param {String | HTMLElement} [ptext] 点击多边形显示的popup内容，可选
-   * @param {Object} [farmData] 农事信息，可选
+   * @param { Object } mapData map实例
+   * @param { Array } points 多边形各点数据
+   * @param { String } [ptext] 点击多边形显示的popup内容，可选
+   * @param { Object } [farmData] 农事信息，可选
    */
-  showArea (mapData, points, ptext = null, farmData = null) {
+  showArea(mapData, points, ptext = null, farmData = null) {
     if (geometry.length) {
       geometry[0].removeFrom(mapData)
       geometry = []
@@ -269,7 +529,7 @@ const newPolygon = {
       geometry.push(L.polygon(points).addTo(mapData).bindPopup(ptext))
     }
     if (farmData) {
-      addInfo(mapData, farmData)
+      addFarmInfo(mapData, farmData)
     }
   }
 }
@@ -282,12 +542,12 @@ const newPolygon = {
 const fileArea = {
   /**
    * @description 已知三角形三点经纬度坐标，计算三角形面积
-   * @param {Array} A A点经纬度坐标
-   * @param {Array} B B点经纬度坐标
-   * @param {Array} C C点经纬度坐标
-   * @returns {Number} area 单位 米
+   * @param { Array } A A点经纬度坐标
+   * @param { Array } B B点经纬度坐标
+   * @param { Array } C C点经纬度坐标
+   * @returns { Number } area 单位 米
    */
-  triangleArea (A, B, C) {
+  triangleArea(A, B, C) {
     const a = map.distance(B, C)
     const b = map.distance(A, C)
     const c = map.distance(A, B)
@@ -297,9 +557,9 @@ const fileArea = {
   },
   /**
    * @description 计算多边形面积
-   * @returns {Number} area
+   * @returns { Number } area
    */
-  getArea () {
+  getArea() {
     const test_points = points
     const direction = [] // 方向标识
     let cosx = null // 坐标系转换用cos值
@@ -363,11 +623,11 @@ const fileArea = {
   },
   /**
    * @description 面积计算子函数
-   * @param {String} dire 主方向选择
-   * @param {Array} direction 多边形点方向集合
-   * @returns {Number} area 单位 米
+   * @param { String } dire 主方向选择
+   * @param { Array } direction 多边形点方向集合
+   * @returns { Number } area 单位 米
    */
-  polylineArea (dire, direction) {
+  polylineArea(dire, direction) {
     // 面积点选择
     const points_b = []
     const points_s = []
@@ -443,4 +703,4 @@ const fileArea = {
   }
 }
 
-export default { newMap, createLayer, newPolygon, fileArea }
+export default { newMap, newMap_hsm, createLayer, newPolygon, fileArea, addRouteInfo, showLine, addMapChoosen }
