@@ -19,58 +19,57 @@ export const menuHeader = supplementPath([
   { path: '/index', title: '首页', icon: 'home' },
   {
     title: '地块管理',
-    icon: 'folder-o',
+    icon: 'map',
     children: [
       { path: '/field-list', title: '查看地块' },
-      { path: '/field-add', title: '添加地块' },
-      { path: '/farm-management', title: '添加地块' }
+      { path: '/field-add', title: '添加地块' }
     ]
   },
   {
     title: '农事管理',
-    icon: 'folder-o',
+    icon: 'calendar',
     children: [
       { path: '/farm-management', title: '农事管理' }
     ]
   },
   {
     title: '作业队管理',
-    icon: 'folder-o',
+    icon: 'group',
     children: [
       { path: '/org-management', title: '任务管理' }
     ]
   },
   {
     title: '处方管理',
-    icon: 'folder-o',
+    icon: 'area-chart',
     children: [
       { path: '/Rx-management', title: '处方列表' }
     ]
   },
   {
     title: '农资管理',
-    icon: 'folder-o',
+    icon: 'leaf',
     children: [
       { path: '/', title: '农资管理' }
     ]
   },
   {
     title: '作业路径',
-    icon: 'folder-o',
+    icon: 'crop',
     children: [
       { path: '/route-list', title: '路径列表' }
     ]
   },
   {
     title: '软件管理',
-    icon: 'folder-o',
+    icon: 'file-zip-o',
     children: [
       { path: 'editon-info', title: '版本信息' }
     ]
   },
   {
     title: '作业数据',
-    icon: 'folder-o',
+    icon: 'bar-chart',
     children: [
       { path: 'task-list', title: '数据列表' }
     ]
@@ -81,7 +80,7 @@ export const menuAside = supplementPath([
   { path: '/index', title: '首页', icon: 'home' },
   {
     title: '地块管理',
-    icon: 'folder-o',
+    icon: 'map',
     children: [
       { path: '/field-list', title: '查看地块' },
       { path: '/field-add', title: '添加地块' }
@@ -89,49 +88,49 @@ export const menuAside = supplementPath([
   },
   {
     title: '农事管理',
-    icon: 'folder-o',
+    icon: 'calendar',
     children: [
       { path: '/farm-management', title: '农事管理' }
     ]
   },
   {
     title: '作业队管理',
-    icon: 'folder-o',
+    icon: 'group',
     children: [
       { path: '/org-management', title: '任务管理' }
     ]
   },
   {
     title: '处方管理',
-    icon: 'folder-o',
+    icon: 'area-chart',
     children: [
       { path: '/Rx-management', title: '处方列表' }
     ]
   },
   {
     title: '农资管理',
-    icon: 'folder-o',
+    icon: 'leaf',
     children: [
       { path: '/', title: '农资管理' }
     ]
   },
   {
     title: '作业路径',
-    icon: 'folder-o',
+    icon: 'crop',
     children: [
       { path: '/route-list', title: '路径列表' }
     ]
   },
   {
     title: '软件管理',
-    icon: 'folder-o',
+    icon: 'file-zip-o',
     children: [
       { path: 'editon-info', title: '版本信息' }
     ]
   },
   {
     title: '作业数据',
-    icon: 'folder-o',
+    icon: 'bar-chart',
     children: [
       { path: 'task-list', title: '数据列表' }
     ]
