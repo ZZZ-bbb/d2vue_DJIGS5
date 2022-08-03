@@ -157,7 +157,7 @@ const frameOut = [
       auth: true
     },
     component: _import('task/map')
-  },
+  }
 ]
 
 /**

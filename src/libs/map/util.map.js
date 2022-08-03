@@ -1,8 +1,7 @@
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './map.css'
-import { request } from '@/api/service'
-
+import api from '@/api'
 
 // 定义默认图标路径
 delete L.Icon.Default.prototype._getIconUrl
@@ -12,15 +11,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 })
 
-var radio = "A"
 var map = '' // 地图实例
 var fieldInfo = '' // 信息控件实例
-var filedMapInfo = '' //地图信息实例
-var filedMapChoosen = "" //地图选项实例
-var tileL = ""
-var layerGroups = "" //高清地图图层
-var layername = ""
-
+var filedMapInfo = '' // 地图信息实例
+var tileL = ''
+var layerGroups = '' // 高清地图图层
+var layername = ''
 
 /**
  * @description 创建地图实例
@@ -28,7 +24,7 @@ var layername = ""
  * @param {Object} option option
  * @returns {Object} map实例
  */
- const newMap_hsm = (domId, option) => {
+const newMap_hsm = (domId, option) => {
   if (map !== undefined && map !== null && map !== '') {
     map.remove()
   }
@@ -38,7 +34,6 @@ var layername = ""
   }).addTo(map)
   return map
 }
-
 
 /**
  * @description 创建地图实例，周子滨用
@@ -63,7 +58,7 @@ const newMap = (domId, option) => {
   }).addTo(map)
   map.on('preclick', e => {
     var url
-    var maplist = document.getElementsByName("map")
+    var maplist = document.getElementsByName('map')
     for (var i in maplist) {
       if (maplist[i].checked) {
         url = maplist[i].value
@@ -71,81 +66,76 @@ const newMap = (domId, option) => {
       }
     }
   })
-  map.on("zoom", e => {
+  map.on('zoom', e => {
     addMapInfo(map)
   })
   map.on('move', e => {
     addMapInfo(map)
-
   })
   map.on('mouseup', e => {
-    var HDmap = document.getElementsByName("HDmap")
-    console.log(HDmap[0].checked);
+    var HDmap = document.getElementsByName('HDmap')
+    console.log(HDmap[0].checked)
     if (HDmap[0].checked) {
-      var zoom = map.getZoom();
+      var zoom = map.getZoom()
       if (zoom < 12) {
-        console.log("放大倍数过小！");
-        console.log("放大倍数过小");
+        console.log('放大倍数过小！')
+        console.log('放大倍数过小')
       } else {
-        var cen = map.getCenter();
-        var size = map.getSize();
-        var SouthWest = map.getBounds();
-        var leftdown =
-          map.getBounds().getSouthWest().lng +
-          "," +
-          map.getBounds().getSouthWest().lat;
-        var vfirstside = cen.lng - map.getBounds().getSouthWest().lng;
-        var vsecendside = cen.lat - map.getBounds().getSouthWest().lat;
-        var viewR = vfirstside * vfirstside + vsecendside * vsecendside;
+        var cen = map.getCenter()
+        // var size = map.getSize()
+        // var SouthWest = map.getBounds()
+        // var leftdown =
+        //   map.getBounds().getSouthWest().lng +
+        //   ',' +
+        //   map.getBounds().getSouthWest().lat
+        var vfirstside = cen.lng - map.getBounds().getSouthWest().lng
+        var vsecendside = cen.lat - map.getBounds().getSouthWest().lat
+        var viewR = vfirstside * vfirstside + vsecendside * vsecendside
         var params = {
           viewZoom: zoom,
           viewPointLat: cen.lat,
           viewPointLng: cen.lng,
-          viewR: viewR,
-        };
-        // console.log("params:" + params.viewZoom);
-        // console.log("cenlat:" + params.viewPointLat);
-        // console.log("cenlng:" + params.viewPointLng);
-        // console.log("vr:" + params.viewR);
-        request({
-          url: 'http://106.55.229.44:443/api/map/get_layer',
-          method: 'get',
-          params: params
-        }).then((res) => {
-          if (res.data.size == 0 ||  _.isEqual(res.data.data, layername)){
-            console.log(1);
+          viewR: viewR
+        }
+        // console.log('params:' + params.viewZoom)
+        // console.log('cenlat:' + params.viewPointLat)
+        // console.log('cenlng:' + params.viewPointLng)
+        // console.log('vr:' + params.viewR)
+        api.SYS_MAP_LAYER_GET(params).then((res) => {
+          if (res.data.size === 0 || _.isEqual(res.data.data, layername)) {
+            console.log(1)
             return
           }
-          layerGroups.clearLayers();
+          layerGroups.clearLayers()
           for (var i in res.data.data) {
             layername = res.data.data
             var a = L.tileLayer
-              .wms("http://106.55.229.44:8888/geoserver/bottom_layer/wms", {
-                layers: res.data.data[i] + ".tif",
-                service: "WMS",
+              .wms('http://106.55.229.44:8888/geoserver/bottom_layer/wms', {
+                layers: res.data.data[i] + '.tif',
+                service: 'WMS',
                 transparent: true,
-                format: "image/png",
+                format: 'image/png',
                 crs: L.CRS.EPSG4326,
                 maxZoom: 100
               })
-              .addTo(map);
-            layerGroups.addLayer(a);
-            // console.log(layerGroups);
-            // console.log(res.data.data[i]);
+              .addTo(map)
+            layerGroups.addLayer(a)
+            // console.log(layerGroups)
+            // console.log(res.data.data[i])
           }
-        });
-        // console.log("center:" + cen);
-        // console.log("size:" + size);
-        // console.log("zoom:" + zoom);
-        // console.log("SouthWest:" + SouthWest);
-        // console.log("leftdown:" + leftdown);
+        })
+        // console.log('center:' + cen)
+        // console.log('size:' + size)
+        // console.log('zoom:' + zoom)
+        // console.log('SouthWest:' + SouthWest)
+        // console.log('leftdown:' + leftdown)
       }
-    }else{
+    } else {
       layerGroups.clearLayers()
-      layername = ""
+      layername = ''
     }
   })
-  
+
   addMapChoosen(map)
   return map
 }
@@ -158,7 +148,7 @@ const newMap = (domId, option) => {
  */
 const showLine = (data, option, map) => {
   const path = L.polyline(data, option).addTo(map)
-  map.fitBounds(path.getBounds());
+  map.fitBounds(path.getBounds())
 }
 
 /**
@@ -169,19 +159,18 @@ const showLine = (data, option, map) => {
  * @returns {Object} newLayer
  */
 const createLayer = (map, url, option) => {
-  // console.log(option);
+  // console.log(option)
   tileL = L.tileLayer(url, option)
   const newLayer = tileL.addTo(map)
   return newLayer
 }
-
 
 /**
  * @description 右上角添加信息控件,内容为地块种植情况
  * @param {Object} map map实例
  * @param {Object} info info
  */
- const addFarmInfo = (map, info) => {
+const addFarmInfo = (map, info) => {
   // info处理
   let farming_flg = 0
   if (info.length) {
@@ -230,7 +219,6 @@ const createLayer = (map, url, option) => {
   }).addTo(map)
 }
 
-
 /**
  * @description 右上角添加信息控件,内容为作业信息
  * @param {Object} map map实例
@@ -250,9 +238,9 @@ const addRouteInfo = (map, info) => {
         <h5>作业时间：${info.filename}</h5></br>
         <h5>上传时间：${info.created_at}</h5></br>
         <h5>作业时间：${info.filename}</h5></br>
-        <h5>模式：${"施肥"}</h5></br>
-        <h5>状态：${"正常"}</h5></br>
-        <h5>作业地址：${"/"}</h5></br>
+        <h5>模式：${'施肥'}</h5></br>
+        <h5>状态：${'正常'}</h5></br>
+        <h5>作业地址：${'/'}</h5></br>
         `
       return this._container
     },
@@ -384,7 +372,7 @@ const newPolygon = {
    * @description 鼠标点击事件，记录点以及绘制辅助线
    * @param { Object } e 坐标信息
    */
-  onClick(e) {
+  onClick (e) {
     points.push([e.latlng.lat, e.latlng.lng])
     lines.addLatLng(e.latlng)
     map.addLayer(tempLines)
@@ -394,7 +382,7 @@ const newPolygon = {
    * @description 鼠标移动事件，绘制辅助线
    * @param { Object } e 坐标信息
    */
-  onMove(e) {
+  onMove (e) {
     if (points.length > 0) {
       // 最新点、当前点、原点
       const ls = [points[points.length - 1], [e.latlng.lat, e.latlng.lng], points[0]]
@@ -404,7 +392,7 @@ const newPolygon = {
   /**
    * @description 鼠标右键，结束多边形绘制，同时解除鼠标事件
    */
-  onContextmenu() {
+  onContextmenu () {
     geometry.push(L.polygon(points).addTo(map))
     lines.remove()
     tempLines.remove()
@@ -418,7 +406,7 @@ const newPolygon = {
    * @description 开始多边形绘制
    * @param { Object } mapData map实例
    */
-  start(mapData) {
+  start (mapData) {
     points = []
     map = mapData
     map.on('click', this.onClick)
@@ -429,7 +417,7 @@ const newPolygon = {
    * @description 结束多边形绘制
    * @returns { String } 多边形各点坐标数据
    */
-  end() {
+  end () {
     CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
@@ -440,7 +428,7 @@ const newPolygon = {
    * @description 移动点索引获取
    * @param { Object } e 坐标信息
    */
-  movePoint(e) {
+  movePoint (e) {
     const oldPoint = [e.oldLatLng.lat, e.oldLatLng.lng]
     if (ind === -1) {
       for (let i = 0; i < points.length; i++) {
@@ -469,7 +457,7 @@ const newPolygon = {
   /**
    * @description 更新移动后的图形
    */
-  updataPolygon() {
+  updataPolygon () {
     tempLines.remove()
     tempLines = L.polyline([], { dashArray: 5 })
     ind = -1
@@ -478,7 +466,7 @@ const newPolygon = {
   /**
    * @description 多边形编辑
    */
-  edit() {
+  edit () {
     if (points.length > 1) {
       for (const point of points) {
         CM.addLayer(
@@ -496,13 +484,13 @@ const newPolygon = {
    * @description 获取多边形地理位置坐标
    * @returns { Array } 初始点坐标
    */
-  getCenter() {
+  getCenter () {
     return points[0]
   },
   /**
    * @description 重新绘制多边形
    */
-  reset() {
+  reset () {
     CM.off('move', this.movePoint)
     map.off('mouseup', this.updataPolygon)
     CM.remove()
@@ -518,7 +506,7 @@ const newPolygon = {
    * @param { String } [ptext] 点击多边形显示的popup内容，可选
    * @param { Object } [farmData] 农事信息，可选
    */
-  showArea(mapData, points, ptext = null, farmData = null) {
+  showArea (mapData, points, ptext = null, farmData = null) {
     if (geometry.length) {
       geometry[0].removeFrom(mapData)
       geometry = []
@@ -547,7 +535,7 @@ const fileArea = {
    * @param { Array } C C点经纬度坐标
    * @returns { Number } area 单位 米
    */
-  triangleArea(A, B, C) {
+  triangleArea (A, B, C) {
     const a = map.distance(B, C)
     const b = map.distance(A, C)
     const c = map.distance(A, B)
@@ -559,7 +547,7 @@ const fileArea = {
    * @description 计算多边形面积
    * @returns { Number } area
    */
-  getArea() {
+  getArea () {
     const test_points = points
     const direction = [] // 方向标识
     let cosx = null // 坐标系转换用cos值
@@ -627,7 +615,7 @@ const fileArea = {
    * @param { Array } direction 多边形点方向集合
    * @returns { Number } area 单位 米
    */
-  polylineArea(dire, direction) {
+  polylineArea (dire, direction) {
     // 面积点选择
     const points_b = []
     const points_s = []

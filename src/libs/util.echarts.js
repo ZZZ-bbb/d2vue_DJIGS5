@@ -210,7 +210,6 @@ const myChart = (id, data) => {
   return chart
 }
 
-
 /**
  * @description 初始化
  * @param {String} id 实例容器id

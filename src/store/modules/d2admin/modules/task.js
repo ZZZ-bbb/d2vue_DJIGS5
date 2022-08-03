@@ -27,7 +27,7 @@ export default {
      * @param {Object} context
      * @param {Object} data data
      */
-     async getLayerData (context, data) {
+    async getLayerData (context, data) {
       const res = await api.SYS_MAP_LAYER_GET(data)
       return res.data
     },
